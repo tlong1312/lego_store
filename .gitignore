@@ -1,0 +1,10 @@
+/vendor/
+.vscode/
+.idea/
+*.log
+
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.bak
