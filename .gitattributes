@@ -5,10 +5,16 @@
 *.js linguist-detectable=true linguist-language=JavaScript
 *.css linguist-detectable=true linguist-language=CSS
 
-# Loại trừ các thư mục không phải source code
-public/admin/assets/** linguist-vendored
+# Loại trừ CHỈ thư viện bên thứ 3 (vendor/library)
 public/admin/vendor/** linguist-vendored
-public/client/** linguist-vendored
+public/client/js/jquery*.js linguist-vendored
+public/client/js/bootstrap*.js linguist-vendored
+public/client/js/owl.carousel*.js linguist-vendored
+public/client/css/bootstrap*.css linguist-vendored
+
+# GIỮ LẠI code tự viết
+# public/client/js/main.js → VẪN TÍNH
+# public/client/css/style.css → VẪN TÍNH
 
 # Loại trừ file config
 *.htaccess linguist-generated
