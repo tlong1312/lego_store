@@ -1,0 +1,16 @@
+# .gitattributes
+
+# Xác định đúng ngôn ngữ
+*.php linguist-detectable=true linguist-language=PHP
+*.js linguist-detectable=true linguist-language=JavaScript
+*.css linguist-detectable=true linguist-language=CSS
+
+# Loại trừ các thư mục không phải source code
+public/admin/assets/** linguist-vendored
+public/admin/vendor/** linguist-vendored
+public/client/** linguist-vendored
+
+# Loại trừ file config
+*.htaccess linguist-generated
+.gitignore linguist-generated
+.gitattributes linguist-generated
