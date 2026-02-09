@@ -1,10 +1,19 @@
-/vendor/
-.vscode/
-.idea/
-*.log
+# .gitignore
 
+# Cache
+*.cache
 .DS_Store
 Thumbs.db
-desktop.ini
-*.tmp
-*.bak
+
+# IDE
+.vscode/
+.idea/
+
+# Uploads (nếu có)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Vendor libraries
+public/admin/vendor/
+public/client/js/jquery*
+public/client/js/bootstrap*
