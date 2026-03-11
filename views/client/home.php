@@ -1,7 +1,7 @@
     <!-- Hero Section Begin -->
     <section class="hero">
         <div class="hero__slider owl-carousel">
-            <div class="hero__items set-bg" data-setbg="public/client/img/hero/hero-1.jpg">
+            <div class="hero__items set-bg" data-setbg="public/client/img/hero/hero-1.png">
                 <div class="container">
                     <div class="row">
                         <div class="col-xl-5 col-lg-7 col-md-8">
@@ -22,7 +22,7 @@
                     </div>
                 </div>
             </div>
-            <div class="hero__items set-bg" data-setbg="public/client/img/hero/hero-2.jpg">
+            <div class="hero__items set-bg" data-setbg="public/client/img/hero/hero-2.png">
                 <div class="container">
                     <div class="row">
                         <div class="col-xl-5 col-lg-7 col-md-8">
@@ -79,7 +79,7 @@
                             <img src="public/client/img/banner/banner-3.jpg" alt="">
                         </div>
                         <div class="banner__item__text">
-                            <h2>LEGO Star Wars</h2>
+                            <h2>LEGO JURASSIC</h2>
                             <a href="./product_list.php">Xem Ngay</a>
                         </div>
                     </div>

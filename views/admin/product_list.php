@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center pb-0">
         <h5 class="mb-0">Danh Sách Sản Phẩm</h5>
-        <a href="product_form.php" class="btn btn-primary">
+        <a href="index.php?controller=adminProduct&action=add" class="btn btn-primary">
             <i class="bx bx-plus me-1"></i>Thêm Mới
         </a>
     </div>

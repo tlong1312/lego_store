@@ -18,5 +18,6 @@ class AdminProductController extends BaseController {
     public function store() {
         echo "Đang xử lý lưu sản phẩm...";
     }
+
 }
 ?>

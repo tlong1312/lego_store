@@ -588,8 +588,29 @@ ol {
 	padding-top: 230px;
 }
 
+.hero__items::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+    /* --- SỬA DÒNG NÀY --- */
+    /* Màu đen đậm ở bên trái (0%) và nhạt dần đến trong suốt ở 60% */
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 60%);
+    
+    z-index: 1;
+}
+
+.hero__text {
+    position: relative;
+    z-index: 2;
+}
+
 .hero__text h6 {
-	color: #e53637;
+	color: #ffd700;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 	font-size: 14px;
 	font-weight: 700;
 	text-transform: uppercase;
@@ -604,7 +625,13 @@ ol {
 }
 
 .hero__text h2 {
-	color: #111111;
+	color: #E3000B;
+    text-shadow:
+        -1px -1px 0 #fff,
+        1px -1px 0 #fff,
+        -1px 1px 0 #fff,
+        1px 1px 0 #fff,
+        0 0 15px rgba(255, 215, 0, 0.3);
 	font-size: 48px;
 	font-weight: 700;
 	line-height: 58px;
@@ -619,6 +646,8 @@ ol {
 
 .hero__text p {
 	font-size: 16px;
+	color: #FFFFFF;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
 	line-height: 28px;
 	margin-bottom: 35px;
 	position: relative;
@@ -714,6 +743,11 @@ ol {
 	font-weight: 700;
 	line-height: 46px;
 	margin-bottom: 10px;
+	text-shadow: 
+        2px 0 0 #fff, -2px 0 0 #fff, 
+        0 2px 0 #fff, 0 -2px 0 #fff, 
+        1px 1px 0 #fff, -1px -1px 0 #fff, 
+        1px -1px 0 #fff, -1px 1px 0 #fff;
 }
 
 .banner__item__text a {
@@ -725,6 +759,11 @@ ol {
 	text-transform: uppercase;
 	padding: 3px 0;
 	position: relative;
+	text-shadow: 
+        2px 0 0 #fff, -2px 0 0 #fff, 
+        0 2px 0 #fff, 0 -2px 0 #fff, 
+        1px 1px 0 #fff, -1px -1px 0 #fff, 
+        1px -1px 0 #fff, -1px 1px 0 #fff;
 }
 
 .banner__item__text a:after {
