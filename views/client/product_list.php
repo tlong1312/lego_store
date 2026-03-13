@@ -6,7 +6,7 @@
                 <div class="breadcrumb__text">
                     <h4>Cửa Hàng</h4>
                     <div class="breadcrumb__links">
-                        <a href="./home.php">Trang chủ</a>
+                        <a href="index.php?controller=home&action=index">Trang chủ</a>
                         <span>Cửa hàng</span>
                     </div>
                 </div>

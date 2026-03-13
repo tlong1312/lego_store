@@ -1,16 +1,25 @@
-<!-- Shop Details Section Begin -->
-<section class="shop-details commerce-detail spad">
+<!-- Breadcrumb Section Begin -->
+<section class="breadcrumb-option">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
-                <div class="product__details__breadcrumb">
-                    <a href="index.php?controller=home&action=index">Trang chủ</a>
-                    <a href="index.php?controller=product&action=index">Cửa hàng</a>
-                    <span>Chi tiết sản phẩm</span>
+                <div class="breadcrumb__text">
+                    <h4>Chi Tiết Sản Phẩm</h4>
+                    <div class="breadcrumb__links">
+                        <a href="index.php?controller=home&action=index">Trang chủ</a>
+                        <a href="index.php?controller=product&action=index">Cửa hàng</a>
+                        <span>Chi tiết sản phẩm</span>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+</section>
+<!-- Breadcrumb Section End -->
 
+<!-- Shop Details Section Begin -->
+<section class="shop-details commerce-detail spad">
+    <div class="container">
         <div class="commerce-detail__card">
             <div class="row align-items-stretch">
                 <div class="col-lg-6">
@@ -110,3 +119,4 @@
         </div>
     </div>
 </section>
+<!-- Shop Details Section End -->

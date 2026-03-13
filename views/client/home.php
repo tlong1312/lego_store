@@ -10,7 +10,7 @@
                             <h2>Thế Giới LEGO 2026</h2>
                             <p>Khám phá bộ sưu tập LEGO chính hãng với hàng ngàn mô hình sáng tạo.
                                 Phát triển tư duy và kỹ năng lắp ráp cho mọi lứa tuổi.</p>
-                            <a href="./product_list.php" class="primary-btn">Mua Ngay <span
+                            <a href="index.php?controller=product&action=index" class="primary-btn">Mua Ngay <span
                                     class="arrow_right"></span></a>
                             <div class="hero__social">
                                 <a href="#"><i class="fa fa-facebook"></i></a>
@@ -32,7 +32,7 @@
                             <h2>Thế Giới LEGO 2026</h2>
                             <p>Khám phá bộ sưu tập LEGO chính hãng với hàng ngàn mô hình sáng tạo.
                                 Phát triển tư duy và kỹ năng lắp ráp cho mọi lứa tuổi.</p>
-                            <a href="./product_list.php" class="primary-btn">Mua Ngay <span
+                            <a href="index.php?controller=product&action=index" class="primary-btn">Mua Ngay <span
                                     class="arrow_right"></span></a>
                             <div class="hero__social">
                                 <a href="#"><i class="fa fa-facebook"></i></a>

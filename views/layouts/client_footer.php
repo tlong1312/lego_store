@@ -5,7 +5,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-6">
                     <div class="footer__about">
                         <div class="footer__logo">
-                            <a href="./home.php"><img src="public/client/img/footer-logo.png" alt=""></a>
+                            <a href="./home.php"><img src="public/client/img/logo.png" alt=""></a>
                         </div>
                         <p>Thế giới LEGO chính hãng - Nơi khơi nguồn sáng tạo và niềm vui lắp ráp cho mọi lứa tuổi.</p>
                         <a href="#"><img src="public/client/img/payment.png" alt=""></a>
