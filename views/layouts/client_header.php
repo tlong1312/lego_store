@@ -11,7 +11,7 @@
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
-    rel="stylesheet">
+        rel="stylesheet">
 
     <!-- Css Styles -->
     <link rel="stylesheet" href="public/client/css/bootstrap.min.css" type="text/css">
@@ -35,7 +35,11 @@
     <div class="offcanvas-menu-wrapper">
         <div class="offcanvas__option">
             <div class="offcanvas__links">
-                <a href="#">Đăng nhập</a>
+                <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
+                    <a href="index.php?controller=auth&action=logout">Đăng xuất</a>
+                <?php else: ?>
+                    <a href="index.php?controller=auth&action=login">Đăng nhập</a>
+                <?php endif; ?>
                 <a href="#">Hỏi đáp</a>
             </div>
             <div class="offcanvas__top__hover">
@@ -49,8 +53,10 @@
         <div class="offcanvas__nav__option">
             <a href="#" class="search-switch"><img src="public/client/img/icon/search.png" alt=""></a>
             <a href="#"><img src="public/client/img/icon/heart.png" alt=""></a>
-            <a href="./cart.php"><img src="public/client/img/icon/cart.png" alt=""> <span>0</span></a>
-            <div class="price">0đ</div>
+            <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
+                <a href="index.php?controller=cart&action=index"><img src="public/client/img/icon/cart.png" alt=""> <span>0</span></a>
+                <div class="price">0đ</div>
+            <?php endif; ?>
         </div>
         <div id="mobile-menu-wrap"></div>
         <div class="offcanvas__text">
@@ -72,7 +78,13 @@
                     <div class="col-lg-6 col-md-5">
                         <div class="header__top__right">
                             <div class="header__top__links">
-                                <a href="#">Đăng nhập</a>
+                                <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
+                                    <a href="#">Chào, <?= htmlspecialchars($_SESSION['user']['fullname']) ?></a>
+                                    <a href="index.php?controller=auth&action=logout">Đăng xuất</a>
+                                <?php else: ?>
+                                    <a href="index.php?controller=auth&action=login">Đăng nhập</a>
+                                    <a href="index.php?controller=auth&action=register">Đăng ký</a>
+                                <?php endif; ?>
                                 <a href="#">Hỏi đáp</a>
                             </div>
                             <div class="header__top__hover">
@@ -101,9 +113,12 @@
                             <li><a href="index.php?controller=product&action=index">Sản Phẩm</a></li>
                             <li><a href="#">Tiện Ích</a>
                                 <ul class="dropdown">
-                                    <li><a href="index.php?controller=cart&action=index">Giỏ Hàng</a></li>
-                                    <li><a href="index.php?controller=cart&action=checkout">Thanh Toán</a></li>
-                                    <li><a href="./detail.php">Chi Tiết Demo</a></li>
+                                    <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
+                                        <li><a href="index.php?controller=cart&action=index">Giỏ Hàng</a></li>
+                                        <li><a href="index.php?controller=cart&action=checkout">Thanh Toán</a></li>
+                                    <?php else: ?>
+                                        <li><a href="index.php?controller=auth&action=login">Đăng nhập để xem giỏ hàng</a></li>
+                                    <?php endif; ?>
                                 </ul>
                             </li>
                             <li><a href="index.php?controller=contact&action=index">Liên Hệ</a></li>
@@ -114,8 +129,10 @@
                     <div class="header__nav__option">
                         <a href="#" class="search-switch"><img src="public/client/img/icon/search.png" alt=""></a>
                         <a href="#"><img src="public/client/img/icon/heart.png" alt=""></a>
-                        <a href="./cart.php"><img src="public/client/img/icon/cart.png" alt=""> <span>0</span></a>
-                        <div class="price">0đ</div>
+                        <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
+                            <a href="index.php?controller=cart&action=index"><img src="public/client/img/icon/cart.png" alt=""> <span>0</span></a>
+                            <div class="price">0đ</div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
