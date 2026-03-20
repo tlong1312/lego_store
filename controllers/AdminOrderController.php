@@ -17,5 +17,28 @@ class AdminOrderController extends BaseController
         require_once 'views/admin/order_list.php';
         require_once 'views/layouts/admin_footer.php';
     }
+
+    // Xem chi tiết đơn hàng
+    public function detail() {
+        if (!isset($_GET['id']) || empty($_GET['id'])) {
+            header("Location: index.php?controller=AdminOrder&action=index");
+            exit();
+        }
+
+        $id = (int)$_GET['id'];
+        $orderModel = new OrderModel();
+        
+        $order = $orderModel->getOrderById($id);
+
+        // Nếu người dùng nhập bừa ID không tồn tại thì trả về trang danh sách
+        if (!$order) {
+            header("Location: index.php?controller=AdminOrder&action=index");
+            exit();
+        }
+
+        require_once 'views/layouts/admin_header.php';
+        require_once 'views/admin/order_detail.php';
+        require_once 'views/layouts/admin_footer.php';
+    }
 }
 ?>
