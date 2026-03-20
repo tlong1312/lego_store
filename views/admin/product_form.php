@@ -47,25 +47,20 @@
                                     placeholder="Ví dụ: 1200" required />
                             </div>
 
-                            <div class="mb-3">
-                                <label class="form-label" for="age_range">Độ tuổi</label>
-                                <input type="text" class="form-control" id="age_range" name="age_range"
-                                    placeholder="Ví dụ: 18+ hoặc 8-14" required />
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold" for="age_range">Độ tuổi phù hợp <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="age_range" name="age_range" min="0"
+                                    placeholder="VD: 7, 18..."
+                                    value="<?= $isEdit ? htmlspecialchars($product['age_range']) : '' ?>" required />
+                                <div id="ageError" class="text-danger mt-1 fw-bold"
+                                    style="display: none; font-size: 13px;">
+                                    <i class="bx bx-error-circle"></i> Độ tuổi không được là số âm!
+                                </div>
                             </div>
                         </div>
 
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label" for="stock_quantity">Số lượng nhập kho</label>
-                                <input type="number" class="form-control" id="stock_quantity" name="stock_quantity"
-                                    placeholder="Ví dụ: 50" required />
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label" for="import_price">Giá nhập (VNĐ)</label>
-                                <input type="number" step="0.01" class="form-control" id="import_price"
-                                    name="import_price" placeholder="Ví dụ: 1500000" required />
-                            </div>
 
                             <div class="mb-3">
                                 <label class="form-label" for="profit">Tỉ lệ lợi nhuận (%)</label>
@@ -98,6 +93,31 @@
                     <button type="submit" class="btn btn-primary">Lưu Sản Phẩm</button>
                     <a href="index.php?controller=AdminProduct&action=index" class="btn btn-secondary">Hủy</a>
                 </form>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const ageInput = document.getElementById('age_range');
+                        const ageError = document.getElementById('ageError');
+
+                        if (ageInput) {
+                            ageInput.addEventListener('blur', function () {
+                                if (this.value !== '' && Number(this.value) < 0) {
+                                    ageError.style.display = 'block';
+                                    this.classList.add('is-invalid');
+                                } else {
+                                    ageError.style.display = 'none';
+                                    this.classList.remove('is-invalid');
+                                }
+                            });
+
+                            ageInput.addEventListener('input', function () {
+                                if (Number(this.value) >= 0) {
+                                    ageError.style.display = 'none';
+                                    this.classList.remove('is-invalid');
+                                }
+                            });
+                        }
+                    });
+                </script>
             </div>
         </div>
     </div>

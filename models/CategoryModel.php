@@ -1,12 +1,12 @@
 <?php
 require_once 'BaseModel.php';
 
-class CategoryModel extends BaseModel {
-    
-    // Đổi tên hàm thành Category
-    public function getAllCategories($keyword = "") {
+class CategoryModel extends BaseModel
+{
+
+    public function getAllCategories($keyword = "")
+    {
         if ($keyword != "") {
-            // Câu lệnh SQL vẫn lấy từ bảng themes để không bị lỗi database
             $sql = "SELECT * FROM themes WHERE name LIKE ? ORDER BY id DESC";
             $stmt = $this->conn->prepare($sql);
             $param = "%" . $keyword . "%";
@@ -17,7 +17,7 @@ class CategoryModel extends BaseModel {
             $sql = "SELECT * FROM themes ORDER BY id DESC";
             $result = $this->conn->query($sql);
         }
-        
+
         $categories = [];
         if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
@@ -27,21 +27,22 @@ class CategoryModel extends BaseModel {
         return $categories;
     }
 
-    public function deleteCategory($id) {
+    public function deleteCategory($id)
+    {
         $sql = "DELETE FROM themes WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $id);
-        
+
         if ($stmt->execute()) {
             return true;
         }
         return false;
     }
 
-    // --- 3 HÀM BỔ SUNG CHO TÍNH NĂNG THÊM & SỬA ---
 
     // 1. Lấy chi tiết 1 danh mục để đổ dữ liệu ra form Sửa
-    public function getCategoryById($id) {
+    public function getCategoryById($id)
+    {
         $sql = "SELECT * FROM themes WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $id);
@@ -51,7 +52,8 @@ class CategoryModel extends BaseModel {
     }
 
     // 2. Thêm danh mục mới
-    public function addCategory($name) {
+    public function addCategory($name)
+    {
         $sql = "INSERT INTO themes (name) VALUES (?)";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("s", $name);
@@ -59,11 +61,32 @@ class CategoryModel extends BaseModel {
     }
 
     // 3. Cập nhật tên danh mục
-    public function updateCategory($id, $name) {
+    public function updateCategory($id, $name)
+    {
         $sql = "UPDATE themes SET name = ? WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("si", $name, $id);
         return $stmt->execute();
+    }
+
+    public function checkNameExists($name, $ignore_id = null)
+    {
+        // Tìm xem có danh mục nào tên giống hệt như vậy không
+        $sql = "SELECT id FROM themes WHERE name = ?";
+
+        if ($ignore_id !== null) {
+            $sql .= " AND id != ?";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bind_param("si", $name, $ignore_id);
+        } else {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bind_param("s", $name);
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        return $result->num_rows > 0;
     }
 }
 ?>

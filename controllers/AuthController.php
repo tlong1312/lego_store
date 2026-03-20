@@ -66,7 +66,6 @@ class AuthController extends BaseController
     public function processLogin()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // File login.php của bạn đang để name là 'email-username'
             $email = $_POST['email-username'] ?? '';
             $password = $_POST['password'] ?? '';
 

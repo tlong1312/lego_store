@@ -9,16 +9,11 @@
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         <div class="navbar-nav align-items-center w-100">
             <div class="nav-item d-flex align-items-center w-100">
-                <form action="index.php" method="GET" class="d-flex align-items-center w-100 m-0">
-                    <input type="hidden" name="controller" value="AdminProduct">
-                    <input type="hidden" name="action" value="index">
-
+                <div class="d-flex align-items-center w-100 m-0">
                     <i class="bx bx-search fs-4 lh-0"></i>
-                    <input type="text" name="keyword" class="form-control border-0 shadow-none"
-                        placeholder="Tìm kiếm sản phẩm theo tên..."
-                        value="<?= isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : '' ?>"
-                        aria-label="Search..." />
-                </form>
+                    <input type="text" id="searchInput" class="form-control border-0 shadow-none"
+                        placeholder="Tìm kiếm sản phẩm theo tên hoặc mã SKU..." aria-label="Search..." />
+                </div>
             </div>
         </div>
 
@@ -60,6 +55,7 @@
         </ul>
     </div>
 </nav>
+
 <div class="card mt-3">
     <div class="card-header d-flex justify-content-between align-items-center pb-0">
         <h5 class="mb-0">Danh Sách Sản Phẩm</h5>
@@ -98,7 +94,7 @@
                         <th>Tên Sản Phẩm</th>
                         <th>Danh Mục</th>
                         <th style="width: 120px;">Mã Sản Phẩm</th>
-                        <th style="width: 100px;" class="text-center">Giá Nhập</th>
+                        <th style="width: 120px;" class="text-center text-primary">Giá Bán</th>
                         <th style="width: 90px;" class="text-center">Tồn Kho</th>
                         <th style="width: 100px;" class="text-center">Trạng Thái</th>
                         <th style="width: 50px;" class="text-center">Hành Động</th>
@@ -112,7 +108,7 @@
                                 <td>
                                     <strong><?= htmlspecialchars($item['name']) ?></strong>
                                     <br>
-                                    <small class="text-muted">Độ tuổi: <?= htmlspecialchars($item['age_range']) ?></small>
+                                    <small class="text-muted">Độ tuổi: <?= htmlspecialchars($item['age_range']) ?>+</small>
                                 </td>
                                 <td>
                                     <?php if (!empty($item['category_name'])): ?>
@@ -122,24 +118,36 @@
                                     <?php endif; ?>
                                 </td>
                                 <td><code><?= htmlspecialchars($item['sku']) ?></code></td>
-                                <td class="text-center">
-                                    <strong><?= number_format($item['import_price'], 0, ',', '.') ?> đ</strong>
-                                </td>
 
                                 <td class="text-center">
                                     <?php
-                                    $borderColor = '';
-                                    if ($item['stock_quantity'] > 5)
-                                        $borderColor = 'border-success text-success';
-                                    elseif ($item['stock_quantity'] > 0)
-                                        $borderColor = 'border-warning text-warning';
-                                    else
-                                        $borderColor = 'border-danger text-danger';
+                                    // Tính toán Giá Bán dựa trên Giá Nhập và % Tỉ lệ lợi nhuận
+                                    $selling_price = $item['import_price'] + ($item['import_price'] * $item['profit_margin'] / 100);
                                     ?>
-                                    <input type="number" min="0"
-                                        class="form-control form-control-sm text-center fw-bold update-stock-input <?= $borderColor ?>"
-                                        value="<?= $item['stock_quantity'] ?>" data-id="<?= $item['id'] ?>"
-                                        style="width: 70px; margin: 0 auto; box-shadow: none;">
+                                    <strong class="text-primary fs-6"><?= number_format($selling_price, 0, ',', '.') ?>
+                                        đ</strong>
+                                    <br>
+                                    <small class="text-muted" style="font-size: 11px;" title="Giá nhập gốc">
+                                        Gốc: <?= number_format($item['import_price'], 0, ',', '.') ?> đ
+                                    </small>
+                                </td>
+
+                                <td class="text-center align-middle">
+                                    <?php
+                                    // Bắt lỗi: Nếu tồn kho bị NULL thì gán bằng 0
+                                    $currentStock = $item['stock_quantity'] ?? 0;
+
+                                    $textColor = '';
+                                    if ($currentStock > 5)
+                                        $textColor = 'text-success'; // Xanh lá: Tồn nhiều
+                                    elseif ($currentStock > 0)
+                                        $textColor = 'text-warning'; // Vàng: Sắp hết
+                                    else
+                                        $textColor = 'text-danger';  // Đỏ: Hết hàng
+                                    ?>
+                                    <span class="fw-bold fs-6 <?= $textColor ?>">
+                                        <?= $currentStock ?>
+                                    </span>
                                 </td>
 
                                 <td class="text-center">
@@ -162,7 +170,8 @@
                                             <i class="bx bx-dots-vertical-rounded"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="index.php?controller=AdminProduct&action=show&id=<?= $item['id'] ?>">
+                                            <a class="dropdown-item"
+                                                href="index.php?controller=AdminProduct&action=show&id=<?= $item['id'] ?>">
                                                 <i class="bx bx-show me-1"></i> Xem
                                             </a>
                                             <a class="dropdown-item"
@@ -195,45 +204,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-        // === 1. XỬ LÝ CẬP NHẬT TỒN KHO ===
-        const stockInputs = document.querySelectorAll('.update-stock-input');
-        stockInputs.forEach(input => {
-            input.addEventListener('change', function () {
-                const productId = this.getAttribute('data-id');
-                let newStock = this.value;
-                const inputElement = this;
-
-                // Chặn số âm
-                if (newStock < 0) {
-                    alert('Số lượng tồn kho không được nhỏ hơn 0!');
-                    newStock = 0;
-                    inputElement.value = 0;
-                }
-
-                // Cập nhật màu viền
-                inputElement.classList.remove('border-success', 'text-success', 'border-warning', 'text-warning', 'border-danger', 'text-danger');
-                if (newStock > 5) inputElement.classList.add('border-success', 'text-success');
-                else if (newStock > 0) inputElement.classList.add('border-warning', 'text-warning');
-                else inputElement.classList.add('border-danger', 'text-danger');
-
-                // Gửi AJAX
-                fetch('index.php?controller=AdminProduct&action=updateStock', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `id=${productId}&stock_quantity=${newStock}`
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            inputElement.style.backgroundColor = '#e8fadf';
-                            setTimeout(() => { inputElement.style.backgroundColor = ''; }, 800);
-                        } else alert('Lỗi: Không thể cập nhật Tồn Kho!');
-                    })
-                    .catch(error => alert('Đã xảy ra lỗi kết nối!'));
-            });
-        });
-
-        // === 2. XỬ LÝ CẬP NHẬT TRẠNG THÁI ===
+        // === 1. XỬ LÝ CẬP NHẬT TRẠNG THÁI ===
         const statusSelects = document.querySelectorAll('.update-status-select');
         statusSelects.forEach(select => {
             select.addEventListener('change', function () {
@@ -250,10 +221,8 @@
                     selectElement.classList.add('bg-secondary');
                 }
 
-                // Cập nhật lại thuộc tính data-status cho dòng (TR) để bộ lọc Radio hoạt động đúng
                 selectElement.closest('tr').setAttribute('data-status', newStatus);
 
-                // Gửi AJAX
                 fetch('index.php?controller=AdminProduct&action=updateStatus', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -267,26 +236,44 @@
             });
         });
 
-        // === 3. XỬ LÝ LỌC TRẠNG THÁI (CHẤM TRÒN RADIO) ===
+        // === 2. TÌM KIẾM TRỰC TIẾP (LIVE SEARCH) & LỌC TRẠNG THÁI ===
+        const searchInput = document.getElementById('searchInput');
         const filterRadios = document.querySelectorAll('.filter-radio');
         const productRows = document.querySelectorAll('.product-row');
 
-        filterRadios.forEach(radio => {
-            radio.addEventListener('change', function () {
-                const filterValue = this.value;
+        // Hàm xử lý lọc kết hợp cả 2 điều kiện
+        function filterTable() {
+            const keyword = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            const activeStatus = document.querySelector('.filter-radio:checked').value;
 
-                productRows.forEach(row => {
-                    if (filterValue === 'all') {
-                        row.style.display = '';
-                    } else {
-                        if (row.getAttribute('data-status') === filterValue) {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    }
-                });
+            productRows.forEach(row => {
+                const productName = row.querySelector('td:nth-child(2) strong').innerText.toLowerCase();
+                const productSku = row.querySelector('td:nth-child(4) code').innerText.toLowerCase();
+                const rowStatus = row.getAttribute('data-status');
+
+                // Kiểm tra 1: Có khớp từ khóa gõ vào không?
+                const isMatchKeyword = productName.includes(keyword) || productSku.includes(keyword);
+
+                // Kiểm tra 2: Có khớp với chấm tròn trạng thái không?
+                const isMatchStatus = (activeStatus === 'all') || (rowStatus === activeStatus);
+
+                // Nếu khớp cả 2 thì hiện, không thì ẩn
+                if (isMatchKeyword && isMatchStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
             });
+        }
+
+        // Bắt sự kiện gõ chữ vào ô tìm kiếm
+        if (searchInput) {
+            searchInput.addEventListener('input', filterTable);
+        }
+
+        // Bắt sự kiện bấm các nút chấm tròn trạng thái
+        filterRadios.forEach(radio => {
+            radio.addEventListener('change', filterTable);
         });
 
     });

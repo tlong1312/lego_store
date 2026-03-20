@@ -78,6 +78,11 @@
                                     <div data-i18n="Manage Products">Quản lý sản phẩm</div>
                                 </a>
                             </li>
+                            <li class="menu-item">
+                                <a href="index.php?controller=AdminReceipt&action=index" class="menu-link">
+                                    <div data-i18n="Manage Products">Quản lý phiếu nhập</div>
+                                </a>
+                            </li>
                         </ul>
                     </li>
 
