@@ -78,5 +78,16 @@ class OrderModel extends BaseModel {
         }
         return 0;
     }
+
+    // Tính doanh thu
+    public function getTotalRevenue() {
+        $sql = "SELECT SUM(total_money) AS total_revenue FROM orders WHERE status = 2";
+        $result = $this->conn->query($sql);
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            return $row['total_revenue'] ? $row['total_revenue'] : 0;
+        }
+        return 0;
+    }
 }
 ?>

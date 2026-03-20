@@ -45,19 +45,23 @@
                 </a>
             </div>
             <div class="col-lg-6 col-md-12 col-6 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="card-title d-flex align-items-start justify-content-between">
-                            <div class="avatar shrink-0">
-                                <i class="menu-icon tf-icons bx bx-dollar-circle bx-sm"></i>
-                            </div>
-                        </div>
-                        <span class="fw-semibold d-block mb-1">Doanh thu</span>
-                        <h3 class="card-title mb-2">45M</h3>
-                        <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i> +12%</small>
-                    </div>
+    <div class="card h-100 shadow-sm border-0 transition-hover">
+        <div class="card-body">
+            <div class="card-title d-flex align-items-start justify-content-between">
+                <div class="avatar shrink-0">
+                    <i class="menu-icon tf-icons bx bx-wallet bx-sm"></i>
                 </div>
             </div>
+            <span class="d-block mb-1">Doanh thu</span>
+            
+            <h3 class="card-title text-nowrap mb-1">
+                <?= isset($totalRevenue) ? number_format($totalRevenue, 0, ',', '.') : '0' ?> đ
+            </h3>
+            
+            <small class="text-muted">Đã hoàn thành</small>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>

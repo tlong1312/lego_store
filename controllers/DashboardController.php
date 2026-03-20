@@ -12,6 +12,7 @@ class DashboardController extends BaseController
         require_once 'models/OrderModel.php';
         $orderModel = new OrderModel();
         $totalOrders = $orderModel->getTotalOrders();
+        $totalRevenue = $orderModel->getTotalRevenue();
         require_once 'views/layouts/admin_header.php';
         require_once 'views/admin/dashboard.php';
         require_once 'views/layouts/admin_footer.php';
