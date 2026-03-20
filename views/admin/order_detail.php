@@ -40,7 +40,8 @@
                 <div class="card-body mt-3">
                     <div class="d-flex justify-content-start align-items-center mb-4">
                         <div class="avatar me-2">
-                            <span class="avatar-initial rounded bg-label-secondary"><i class="bx bx-map bx-sm"></i></span>
+                            <span class="avatar-initial rounded bg-label-secondary"><i
+                                    class="bx bx-map bx-sm"></i></span>
                         </div>
                         <div class="d-flex flex-column">
                             <h6 class="mb-0">Nhà riêng / Nơi làm việc</h6>
@@ -59,17 +60,26 @@
                 <div class="card-body mt-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <span class="fw-semibold text-muted">Trạng thái:</span>
-                        <?php 
-                            switch ($order['status']) {
-                                case 0: echo '<span class="badge bg-warning">Chờ xử lý</span>'; break;
-                                case 1: echo '<span class="badge bg-primary">Đang giao</span>'; break;
-                                case 2: echo '<span class="badge bg-success">Hoàn thành</span>'; break;
-                                case 3: echo '<span class="badge bg-secondary">Đã hủy</span>'; break;
-                                default: echo '<span class="badge bg-dark">Không rõ</span>';
-                            }
+                        <?php
+                        switch ($order['status']) {
+                            case 0:
+                                echo '<span class="badge bg-warning">Chờ xử lý</span>';
+                                break;
+                            case 1:
+                                echo '<span class="badge bg-primary">Đang giao</span>';
+                                break;
+                            case 2:
+                                echo '<span class="badge bg-success">Hoàn thành</span>';
+                                break;
+                            case 3:
+                                echo '<span class="badge bg-secondary">Đã hủy</span>';
+                                break;
+                            default:
+                                echo '<span class="badge bg-dark">Không rõ</span>';
+                        }
                         ?>
                     </div>
-                    
+
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <span class="fw-semibold text-muted">Phương thức TT:</span>
                         <span class="fw-bold text-dark"><?= htmlspecialchars($order['payment_method']) ?></span>
@@ -79,11 +89,12 @@
 
                     <div class="d-flex justify-content-between align-items-center mt-3 pb-1">
                         <span class="fw-bold fs-5 text-dark">Tổng tiền:</span>
-                        <span class="fw-bold fs-5 text-danger"><?= number_format($order['total_money'], 0, ',', '.') ?> đ</span>
+                        <span class="fw-bold fs-5 text-danger"><?= number_format($order['total_money'], 0, ',', '.') ?>
+                            đ</span>
                     </div>
                 </div>
             </div>
-            
-            </div>
+
+        </div>
     </div>
 </div>
