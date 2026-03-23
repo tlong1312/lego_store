@@ -21,106 +21,106 @@
     <section class="checkout spad">
         <div class="container">
             <div class="checkout__form">
-                <form action="#">
-                    <div class="row">
-                        <div class="col-lg-8 col-md-6">
-                            <h6 class="checkout__title">Thông tin giao hàng</h6>
-                            <div class="checkout__input">
-                                <p>Họ và tên người nhận<span>*</span></p>
-                                <input type="text" placeholder="Nguyễn Văn A">
-                            </div>
+                <form action="index.php?controller=cart&action=processCheckout" method="POST">
+    <div class="row">
+        <div class="col-lg-8 col-md-6">
+            <h6 class="checkout__title">Thông tin giao hàng</h6>
+            
+            <div class="checkout__input mb-4" style="background: #f5f5f5; padding: 15px; border-radius: 5px;">
+                <label class="mr-3" style="cursor: pointer;">
+                    <input type="radio" name="address_option" value="account" onclick="useAccountAddress()" checked> 
+                    <span style="font-weight: bold; color: #111;">Dùng thông tin tài khoản</span>
+                </label>
+                <label style="cursor: pointer;">
+                    <input type="radio" name="address_option" value="new" onclick="clearAddress()"> 
+                    <span style="font-weight: bold; color: #111;">Nhập địa chỉ mới</span>
+                </label>
+            </div>
 
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="checkout__input">
-                                        <p>Số điện thoại<span>*</span></p>
-                                        <input type="text">
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="checkout__input">
-                                        <p>Email<span>*</span></p>
-                                        <input type="text">
-                                    </div>
-                                </div>
-                            </div>
+            <div class="checkout__input">
+                <p>Họ và tên người nhận<span>*</span></p>
+                <input type="text" id="fullname" name="fullname" value="<?= htmlspecialchars($user['fullname']) ?>" style="color: #000 !important;" required>
+            </div>
+            <div class="checkout__input">
+                <p>Số điện thoại<span>*</span></p>
+                <input type="text" id="phone" name="phone" value="<?= htmlspecialchars($user['phone']) ?>" style="color: #000 !important;" required>
+            </div>
+            <div class="checkout__input">
+                <p>Địa chỉ giao hàng chi tiết<span>*</span></p>
+                <input type="text" id="address" name="address" value="<?= htmlspecialchars($user['address']) ?>" style="color: #000 !important;" required>
+            </div>
+        </div>
 
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="checkout__input">
-                                        <p>Tỉnh / Thành phố<span>*</span></p>
-                                        <input type="text" placeholder="Hồ Chí Minh">
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="checkout__input">
-                                        <p>Quận / Huyện<span>*</span></p>
-                                        <input type="text" placeholder="Quận 1">
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="checkout__input">
-                                        <p>Phường / Xã<span>*</span></p>
-                                        <input type="text" placeholder="Phường Bến Nghé">
-                                    </div>
-                                </div>
-                            </div>
+        <div class="col-lg-4 col-md-6">
+            <div class="checkout__order">
+                <h4 class="order__title">Đơn hàng của bạn</h4>
+                <div class="checkout__order__products">Sản phẩm <span>Thành tiền</span></div>
+                <ul class="checkout__total__products">
+                    <?php 
+                    $total = 0;
+                    foreach($cart as $item): 
+                        $sub = $item['price'] * $item['quantity'];
+                        $total += $sub;
+                    ?>
+                        <li><?= htmlspecialchars($item['name']) ?> (x<?= $item['quantity'] ?>) <span><?= number_format($sub, 0, ',', '.') ?>đ</span></li>
+                    <?php endforeach; ?>
+                </ul>
+                <ul class="checkout__total__all">
+                    <li>Tổng thanh toán <span><?= number_format($total, 0, ',', '.') ?>đ</span></li>
+                </ul>
 
-                            <div class="checkout__input">
-                                <p>Số nhà, tên đường<span>*</span></p>
-                                <input type="text" placeholder="Số 123, Đường Lê Lợi..." class="checkout__input__add">
-                            </div>
+                <div class="checkout__input__checkbox">
+                    <label for="payment">
+                        Tiền mặt khi nhận hàng (COD)
+                        <input type="radio" id="payment" name="payment_method" value="COD" onclick="hideBankInfo()" checked>
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div class="checkout__input__checkbox">
+                    <label for="paypal">
+                        Chuyển khoản ngân hàng
+                        <input type="radio" id="paypal" name="payment_method" value="Chuyển khoản" onclick="showBankInfo()">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <div id="bank_info_box" style="display: none; background: #e9ecef; padding: 15px; margin-bottom: 20px; border-left: 4px solid #111;">
+                    <p class="mb-1"><strong>Ngân hàng:</strong> Vietcombank</p>
+                    <p class="mb-1"><strong>STK:</strong> 0123456789</p>
+                    <p class="mb-0"><strong>Chủ TK:</strong> LEGO STORE</p>
+                </div>
 
-                            <div class="checkout__input">
-                                <p>Ghi chú đơn hàng</p>
-                                <input type="text" placeholder="Ví dụ: Giao hàng giờ hành chính...">
-                            </div>
-                        </div>
+                <div class="checkout__input__checkbox">
+                    <label for="vnpay">
+                        Thanh toán Online (VNPAY)
+                        <input type="radio" id="vnpay" name="payment_method" value="VNPAY Online" onclick="hideBankInfo()">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
 
-                        <div class="col-lg-4 col-md-6">
-                            <div class="checkout__order">
-                                <h4 class="order__title">Đơn hàng của bạn</h4>
-                                
-                                <!-- Danh sách sản phẩm (Demo) -->
-                                <div class="checkout__order__products">Sản phẩm <span>Thành tiền</span></div>
-                                <ul class="checkout__total__products">
-                                    <li>01. LEGO Technic 42115 <span>5.000.000đ</span></li>
-                                    <li>02. LEGO City Police <span>1.200.000đ</span></li>
-                                </ul>
-                                
-                                <ul class="checkout__total__all">
-                                    <li>Tạm tính <span>6.200.000đ</span></li>
-                                    <li>Phí ship <span>30.000đ</span></li>
-                                    <li>Tổng cộng <span>6.230.000đ</span></li>
-                                </ul>
+                <button type="submit" class="site-btn">XÁC NHẬN ĐẶT HÀNG</button>
+            </div>
+        </div>
+    </div>
+</form>
 
-                                <div class="checkout__input__checkbox">
-                                    <label for="payment">
-                                        Thanh toán khi nhận hàng (COD)
-                                        <input type="radio" id="payment" name="payment_method" checked>
-                                        <span class="checkmark"></span>
-                                    </label>
-                                </div>
-                                <div class="checkout__input__checkbox">
-                                    <label for="paypal">
-                                        Chuyển khoản ngân hàng
-                                        <input type="radio" id="paypal" name="payment_method">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                </div>
-                                <div class="checkout__input__checkbox">
-                                    <label for="vnpay">
-                                        Thanh toán Online (VNPAY)
-                                        <input type="radio" id="vnpay" name="payment_method">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                </div>
-
-                                <button type="submit" class="site-btn">ĐẶT HÀNG</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+<script>
+    // Điền lại thông tin tài khoản
+    function useAccountAddress() {
+        document.getElementById('fullname').value = '<?= htmlspecialchars($user['fullname']) ?>';
+        document.getElementById('phone').value = '<?= htmlspecialchars($user['phone']) ?>';
+        document.getElementById('address').value = '<?= htmlspecialchars($user['address']) ?>';
+    }
+    // Xóa trắng để nhập mới
+    function clearAddress() {
+        document.getElementById('fullname').value = '';
+        document.getElementById('phone').value = '';
+        document.getElementById('address').value = '';
+        document.getElementById('fullname').focus();
+    }
+    // Ẩn/hiện box ngân hàng
+    function showBankInfo() { document.getElementById('bank_info_box').style.display = 'block'; }
+    function hideBankInfo() { document.getElementById('bank_info_box').style.display = 'none'; }
+</script>
             </div>
         </div>
     </section>

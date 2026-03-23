@@ -60,7 +60,7 @@
                     </div>
                     <div class="banner__item__text">
                         <h2>LEGO Technic 2026</h2>
-                        <a href="./product_list.php">Xem Ngay</a>
+                        <a href="index.php?controller=product&action=index&category_id=1">Xem Ngay</a>
                     </div>
                 </div>
             </div>
@@ -71,7 +71,7 @@
                     </div>
                     <div class="banner__item__text">
                         <h2>LEGO City</h2>
-                        <a href="./product_list.php">Xem Ngay</a>
+                        <a href="index.php?controller=product&action=index&category_id=4">Xem Ngay</a>
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
                     </div>
                     <div class="banner__item__text">
                         <h2>LEGO JURASSIC</h2>
-                        <a href="./product_list.php">Xem Ngay</a>
+                        <a href="index.php?controller=product&action=index">Xem Ngay</a>
                     </div>
                 </div>
             </div>
@@ -97,16 +97,13 @@
         <div class="row">
             <div class="col-lg-12">
                 <ul class="filter__controls">
-                    <li class="active" data-filter="*">Bán Chạy Nhất</li>
                     <li data-filter=".new-arrivals">Hàng Mới Về</li>
-                    <li data-filter=".hot-sales">Giảm Giá Sốc</li>
                 </ul>
             </div>
         </div>
         <div class="row product__filter">
             <?php foreach ($latest_products as $product): ?>
                 <?php
-                // CÔNG THỨC YÊU CẦU ĐỒ ÁN: Giá bán = giá nhập * (100% + tỷ lệ lợi nhuận)
                 $gia_ban = $product['import_price'] * (1 + $product['profit_margin'] / 100);
                 ?>
                 <div class="col-lg-3 col-md-6 col-sm-6 col-md-6 col-sm-6 mix new-arrivals">

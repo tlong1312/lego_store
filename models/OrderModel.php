@@ -3,6 +3,41 @@ require_once 'BaseModel.php';
 
 class OrderModel extends BaseModel {
 
+    public function createOrder($user_id, $fullname, $phone, $address, $total_money, $payment_method) {
+        $sql = "INSERT INTO orders (user_id, fullname, phone, shipping_address, total_money, payment_method, status) 
+                VALUES (?, ?, ?, ?, ?, ?, 'Chờ xử lý')";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("isssds", $user_id, $fullname, $phone, $address, $total_money, $payment_method);
+        
+        if ($stmt->execute()) {
+            return $this->conn->insert_id;
+        }
+        return false;
+    }
+
+    public function createOrderDetail($order_id, $product_id, $quantity, $price) {
+        $sql = "INSERT INTO order_details (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("iiid", $order_id, $product_id, $quantity, $price);
+        return $stmt->execute();
+    }
+
+    public function reduceProductStock($product_id, $quantity) {
+        $sql = "UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ? AND stock_quantity >= ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("iii", $quantity, $product_id, $quantity);
+        return $stmt->execute();
+    }
+
+    public function getOrderHistory($user_id) {
+        $sql = "SELECT * FROM orders WHERE user_id = ? ORDER BY id DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+    
+
     // 1. Lấy danh sách đơn hàng (lọc theo trạng thái)
        public function getAllOrders($status = '', $keyword = '', $date = '') {
         $sql = "SELECT * FROM orders WHERE 1=1";

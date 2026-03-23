@@ -207,5 +207,124 @@ class ProductModel extends BaseModel
         return false;
     }
 
+    public function getAllThemes() {
+        $sql = "SELECT * FROM themes";
+        $result = $this->conn->query($sql);
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function getTotalFilteredProducts($keyword = '', $category_id = 0, $min_price = 0, $max_price = 0) {
+        $sql = "SELECT COUNT(*) as total FROM products WHERE status = 1";
+        $types = "";
+        $params = [];
+        
+        if (!empty($keyword)) {
+            $sql .= " AND name LIKE ?";
+            $types .= "s";
+            $params[] = "%$keyword%";
+        }
+        if ($category_id > 0) {
+            $sql .= " AND theme_id = ?";
+            $types .= "i";
+            $params[] = $category_id;
+        }
+        if ($min_price > 0) {
+            $sql .= " AND (import_price * (1 + profit_margin/100)) >= ?";
+            $types .= "d";
+            $params[] = $min_price;
+        }
+        if ($max_price > 0) {
+            $sql .= " AND (import_price * (1 + profit_margin/100)) <= ?";
+            $types .= "d";
+            $params[] = $max_price;
+        }
+        
+        $stmt = $this->conn->prepare($sql);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params); 
+        }
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc()['total'];
+    }
+
+    public function getFilteredProducts($limit, $offset, $keyword = '', $category_id = 0, $min_price = 0, $max_price = 0, $sort = '') {
+        $sql = "SELECT p.*, t.name as theme_name FROM products p JOIN themes t ON p.theme_id = t.id WHERE p.status = 1";
+        $types = "";
+        $params = [];
+        
+        if (!empty($keyword)) {
+            $sql .= " AND p.name LIKE ?";
+            $types .= "s";
+            $params[] = "%$keyword%";
+        }
+        if ($category_id > 0) {
+            $sql .= " AND p.theme_id = ?";
+            $types .= "i";
+            $params[] = $category_id;
+        }
+        if ($min_price > 0) {
+            $sql .= " AND (p.import_price * (1 + p.profit_margin/100)) >= ?";
+            $types .= "d";
+            $params[] = $min_price;
+        }
+        if ($max_price > 0) {
+            $sql .= " AND (p.import_price * (1 + p.profit_margin/100)) <= ?";
+            $types .= "d";
+            $params[] = $max_price;
+        }
+        
+        if ($sort == 'asc') {
+            $sql .= " ORDER BY (p.import_price * (1 + p.profit_margin/100)) ASC";
+        } elseif ($sort == 'desc') {
+            $sql .= " ORDER BY (p.import_price * (1 + p.profit_margin/100)) DESC";
+        } else {
+            $sql .= " ORDER BY p.id DESC";
+        }
+        
+        $sql .= " LIMIT ? OFFSET ?";
+        $types .= "ii";
+        $params[] = $limit;
+        $params[] = $offset;
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function getProductReviews($product_id) {
+        $sql = "SELECT r.*, u.fullname FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = ? ORDER BY r.created_at DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $product_id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function checkUserBoughtProduct($user_id, $product_id) {
+        $sql = "SELECT od.id FROM order_details od 
+                JOIN orders o ON o.id = od.order_id 
+                WHERE o.user_id = ? AND od.product_id = ? LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ii", $user_id, $product_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->num_rows > 0;
+    }
+
+    public function checkUserReviewed($user_id, $product_id) {
+        $sql = "SELECT id FROM reviews WHERE user_id = ? AND product_id = ? LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ii", $user_id, $product_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->num_rows > 0;
+    }
+
+    public function addReview($product_id, $user_id, $rating, $comment) {
+        $sql = "INSERT INTO reviews (product_id, user_id, rating, comment) VALUES (?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("iiis", $product_id, $user_id, $rating, $comment);
+        return $stmt->execute();
+    }
 }
 ?>

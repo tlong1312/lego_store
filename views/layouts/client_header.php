@@ -54,7 +54,8 @@
             <a href="#" class="search-switch"><img src="public/client/img/icon/search.png" alt=""></a>
             <a href="#"><img src="public/client/img/icon/heart.png" alt=""></a>
             <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
-                <a href="index.php?controller=cart&action=index"><img src="public/client/img/icon/cart.png" alt=""> <span>0</span></a>
+                <a href="index.php?controller=cart&action=index"><img src="public/client/img/icon/cart.png" alt="">
+                    <span>0</span></a>
                 <div class="price">0đ</div>
             <?php endif; ?>
         </div>
@@ -87,13 +88,7 @@
                                 <?php endif; ?>
                                 <a href="#">Hỏi đáp</a>
                             </div>
-                            <div class="header__top__hover">
-                                <span>VND <i class="arrow_carrot-down"></i></span>
-                                <ul>
-                                    <li>VND</li>
-                                    <li>USD</li>
-                                </ul>
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -103,7 +98,8 @@
             <div class="row">
                 <div class="col-lg-3 col-md-3">
                     <div class="header__logo">
-                        <a href="index.php?controller=home&action=index"><img src="public/client/img/logo.png" alt=""></a>
+                        <a href="index.php?controller=home&action=index"><img src="public/client/img/logo.png"
+                                alt=""></a>
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-6">
@@ -112,12 +108,30 @@
                             <li class="active"><a href="index.php?controller=home&action=index">Trang Chủ</a></li>
                             <li><a href="index.php?controller=product&action=index">Sản Phẩm</a></li>
                             <li><a href="#">Tiện Ích</a>
-                                <ul class="dropdown">
+                                <ul class="dropdown"
+                                    style="min-width: 200px; background: #fff; padding: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
                                     <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
-                                        <li><a href="index.php?controller=cart&action=index">Giỏ Hàng</a></li>
-                                        <li><a href="index.php?controller=cart&action=checkout">Thanh Toán</a></li>
+                                        <li style="padding: 8px 15px;" onmouseover="this.style.backgroundColor='#f0f0f0'"
+                                            onmouseout="this.style.backgroundColor='transparent'">
+                                            <a href="index.php?controller=cart&action=index"
+                                                style="color: #000; display: block; padding: 5px 0;">Giỏ Hàng</a>
+                                        </li>
+                                        <li style="padding: 8px 15px;" onmouseover="this.style.backgroundColor='#f0f0f0'"
+                                            onmouseout="this.style.backgroundColor='transparent'">
+                                            <a href="index.php?controller=cart&action=checkout"
+                                                style="color: #000; display: block; padding: 5px 0;">Thanh Toán</a>
+                                        </li>
+                                        <li style="padding: 8px 15px;" onmouseover="this.style.backgroundColor='#f0f0f0'"
+                                            onmouseout="this.style.backgroundColor='transparent'">
+                                            <a href="index.php?controller=cart&action=history"
+                                                style="color: #000; display: block; padding: 5px 0; white-space: nowrap;">Lịch
+                                                Sử Đơn Hàng</a>
+                                        </li>
                                     <?php else: ?>
-                                        <li><a href="index.php?controller=auth&action=login">Đăng nhập để xem giỏ hàng</a></li>
+                                        <li style="padding: 8px 15px;" onmouseover="this.style.backgroundColor='#f0f0f0'"
+                                            onmouseout="this.style.backgroundColor='transparent'">
+                                            <a href="index.php?controller=auth&action=login"
+                                                style="color: #000; display: block; padding: 5px 0;">Đăng nhập</a></li>
                                     <?php endif; ?>
                                 </ul>
                             </li>
@@ -130,8 +144,8 @@
                         <a href="#" class="search-switch"><img src="public/client/img/icon/search.png" alt=""></a>
                         <a href="#"><img src="public/client/img/icon/heart.png" alt=""></a>
                         <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
-                            <a href="index.php?controller=cart&action=index"><img src="public/client/img/icon/cart.png" alt=""> <span>0</span></a>
-                            <div class="price">0đ</div>
+                            <a href="index.php?controller=cart&action=index"><img src="public/client/img/icon/cart.png"
+                                    alt=""> <span>0</span></a>
                         <?php endif; ?>
                     </div>
                 </div>

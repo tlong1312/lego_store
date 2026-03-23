@@ -101,9 +101,59 @@ class CartController extends BaseController{
     }
 
     public function checkout() {
-        require_once 'views/layouts/client_header.php';
-        require_once 'views/client/checkout.php';
-        require_once 'views/layouts/client_footer.php';
+        $this->checkLogin();
+        if (empty($_SESSION['cart'])) {
+            $this->redirect('index.php?controller=cart&action=index');
+        }
+        $data['cart'] = $_SESSION['cart'];
+        $data['user'] = $_SESSION['user'];
+
+        $this->view('layouts/client_header');
+        $this->view('client/checkout', $data);
+        $this->view('layouts/client_footer');
+    }
+
+    public function processCheckout() {
+        $this->checkLogin();
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SESSION['cart'])) {
+            require_once 'models/OrderModel.php';
+            $orderModel = new OrderModel();
+
+            $fullname = $_POST['fullname'];
+            $phone = $_POST['phone'];
+            $address = $_POST['address'];
+            $payment_method = $_POST['payment_method'];
+            $user_id = $_SESSION['user']['id'];
+
+            $total_amount = 0;
+            foreach ($_SESSION['cart'] as $item) {
+                $total_amount += $item['price'] * $item['quantity'];
+            }
+
+            $order_id = $orderModel->createOrder($user_id, $fullname, $phone, $address, $total_amount, $payment_method);
+
+            if ($order_id) {
+                foreach ($_SESSION['cart'] as $item) {
+                    $orderModel->createOrderDetail($order_id, $item['id'], $item['quantity'], $item['price']);
+                    $orderModel->reduceProductStock($item['id'], $item['quantity']);
+                }
+                unset($_SESSION['cart']); 
+                
+                echo "<script>alert('Đặt hàng thành công!'); window.location.href='index.php?controller=cart&action=history';</script>";
+            }
+        }
+    }
+
+    public function history() {
+        $this->checkLogin();
+        require_once 'models/OrderModel.php';
+        $orderModel = new OrderModel();
+        
+        $data['orders'] = $orderModel->getOrderHistory($_SESSION['user']['id']);
+
+        $this->view('layouts/client_header');
+        $this->view('client/history', $data);
+        $this->view('layouts/client_footer');
     }
 }
 ?>
