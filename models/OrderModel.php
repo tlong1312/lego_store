@@ -5,7 +5,7 @@ class OrderModel extends BaseModel {
 
     public function createOrder($user_id, $fullname, $phone, $address, $total_money, $payment_method) {
         $sql = "INSERT INTO orders (user_id, fullname, phone, shipping_address, total_money, payment_method, status) 
-                VALUES (?, ?, ?, ?, ?, ?, 'Chờ xử lý')";
+                VALUES (?, ?, ?, ?, ?, ?, 0)";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("isssds", $user_id, $fullname, $phone, $address, $total_money, $payment_method);
         

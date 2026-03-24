@@ -31,20 +31,36 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if(!empty($orders)): foreach($orders as $order): ?>
-                                <tr>
-                                    <td class="cart__price">#<?= $order['id'] ?></td>
-                                    <td><?= $order['created_at'] ?? 'Vừa xong' ?></td>
-                                    <td>
-                                        <strong><?= htmlspecialchars($order['fullname']) ?></strong><br>
-                                        <small><?= htmlspecialchars($order['phone']) ?></small>
-                                    </td>
-                                    <<td class="cart__price" style="color: #e53637;"><?= number_format($order['total_money'], 0, ',', '.') ?>đ</td>
-                                    <td><?= htmlspecialchars($order['payment_method']) ?></td>
-                                    <td><span class="badge badge-dark p-2"><?= htmlspecialchars($order['status']) ?></span></td>
-                                </tr>
-                            <?php endforeach; else: ?>
-                                <tr><td colspan="6" class="text-center py-4">Bạn chưa có đơn hàng nào!</td></tr>
+                            <?php if (!empty($orders)):
+                                foreach ($orders as $order): ?>
+                                    <tr>
+                                        <td class="cart__price">#<?= $order['id'] ?></td>
+                                        <td><?= $order['created_at'] ?? 'Vừa xong' ?></td>
+                                        <td>
+                                            <strong><?= htmlspecialchars($order['fullname']) ?></strong><br>
+                                            <small><?= htmlspecialchars($order['phone']) ?></small>
+                                        </td>
+                                        <<td class="cart__price" style="color: #e53637;">
+                                            <?= number_format($order['total_money'], 0, ',', '.') ?>đ</td>
+                                            <td><?= htmlspecialchars($order['payment_method']) ?></td>
+                                            <td><span class="badge badge-dark p-2">
+                                                    <?php
+                                                    if ($order['status'] == 0) {
+                                                        echo 'Chờ xử lý';
+                                                    } elseif ($order['status'] == 1) {
+                                                        echo 'Đang giao';
+                                                    } elseif ($order['status'] == 2) {
+                                                        echo 'Hoàn thành';
+                                                    } elseif ($order['status'] == 3) {
+                                                        echo 'Đã hủy';
+                                                    } else {
+                                                        echo 'Không rõ';
+                                                    }
+                                                    ?>
+                                            </td>
+                                        </tr>
+                                <?php endforeach; else: ?>
+                                    <tr><td colspan="6" class="text-center py-4">Bạn chưa có đơn hàng nào!</td></tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
