@@ -105,16 +105,24 @@ class AdminCategoryController extends BaseController
     public function delete()
     {
         if (isset($_GET['id'])) {
-            $id = $_GET['id'];
+            $id = (int) $_GET['id'];
             $categoryModel = new CategoryModel();
 
-            $isSuccess = $categoryModel->deleteCategory($id);
-            if ($isSuccess) {
-                header("Location: index.php?controller=AdminCategory&action=index&msg=deleted");
+            $hasActiveProducts = $categoryModel->checkActiveProducts($id);
+
+            if ($hasActiveProducts) {
+                header("Location: index.php?controller=AdminCategory&action=index&msg=error_has_products");
                 exit();
-            } else {
-                echo "<script>alert('Lỗi: Không thể xóa! Danh mục này có thể đang chứa sản phẩm.'); window.history.back();</script>";
             }
+
+            $result = $categoryModel->deleteCategory($id);
+
+            if ($result) {
+                header("Location: index.php?controller=AdminCategory&action=index&msg=delete_success");
+            } else {
+                header("Location: index.php?controller=AdminCategory&action=index&msg=delete_error");
+            }
+            exit();
         }
     }
 }

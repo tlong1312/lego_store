@@ -80,12 +80,23 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="public/admin/assets/images/<?= htmlspecialchars($item['image']) ?>"
-                                                    class="rounded me-3" style="width: 40px; height: 40px; object-fit: cover;">
-                                                <div>
-                                                    <strong><?= htmlspecialchars($item['name']) ?></strong><br>
-                                                    <small class="text-muted">SKU: <?= htmlspecialchars($item['sku']) ?></small>
-                                                </div>
+                                                <?php if (!empty($item['name'])): ?>
+                                                    <img src="public/admin/assets/images/<?= htmlspecialchars($item['image']) ?>"
+                                                        class="rounded me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                                    <div>
+                                                        <strong><?= htmlspecialchars($item['name']) ?></strong><br>
+                                                        <small class="text-muted">SKU: <?= htmlspecialchars($item['sku']) ?></small>
+                                                    </div>
+                                                
+                                                <?php else: ?>
+                                                    <div class="avatar me-3" style="width: 40px; height: 40px;">
+                                                        <span class="avatar-initial rounded bg-label-danger"><i class="bx bx-trash"></i></span>
+                                                    </div>
+                                                    <div>
+                                                        <strong class="text-danger fst-italic">Sản phẩm đã bị xóa khỏi hệ thống</strong><br>
+                                                        <small class="text-muted">Mã SP cũ: #<?= $item['product_id'] ?></small>
+                                                    </div>
+                                                <?php endif; ?>
                                             </div>
                                         </td>
                                         <td class="text-center align-middle fw-bold"><?= $item['quantity'] ?></td>

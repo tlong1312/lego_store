@@ -90,7 +90,7 @@
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="continue__btn">
-                                <a href="./product_list.php">Tiếp Tục Mua Sắm</a>
+                                <a href="index.php?controller=product&action=index">Tiếp Tục Mua Sắm</a>
                             </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6">

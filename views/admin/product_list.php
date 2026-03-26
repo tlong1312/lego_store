@@ -134,20 +134,34 @@
 
                                 <td class="text-center align-middle">
                                     <?php
-                                    // Bắt lỗi: Nếu tồn kho bị NULL thì gán bằng 0
+                                    // 1. Số lượng tồn thực tế
                                     $currentStock = $item['stock_quantity'] ?? 0;
 
+                                    $lowStockThreshold = $item['low_stock_threshold'] ?? 5;
+
                                     $textColor = '';
-                                    if ($currentStock > 5)
-                                        $textColor = 'text-success'; // Xanh lá: Tồn nhiều
-                                    elseif ($currentStock > 0)
-                                        $textColor = 'text-warning'; // Vàng: Sắp hết
-                                    else
-                                        $textColor = 'text-danger';  // Đỏ: Hết hàng
+                                    $stockLabel = '';
+
+                                    // 3. Phân loại động theo cấu hình từng mặt hàng
+                                    if ($currentStock <= 0) {
+                                        $textColor = 'text-danger';       // Đỏ
+                                        $stockLabel = 'Hết hàng';
+                                    } elseif ($currentStock <= $lowStockThreshold) {
+                                        $textColor = 'text-warning';      // Vàng cam
+                                        $stockLabel = 'Sắp hết';
+                                    } else {
+                                        $textColor = 'text-success';      // Xanh lá
+                                        $stockLabel = 'Còn hàng';
+                                    }
                                     ?>
+
                                     <span class="fw-bold fs-6 <?= $textColor ?>">
                                         <?= $currentStock ?>
                                     </span>
+                                    <br>
+                                    <small class="<?= $textColor ?>" style="font-size: 11px; font-weight: 500;">
+                                        <?= $stockLabel ?>
+                                    </small>
                                 </td>
 
                                 <td class="text-center">
@@ -179,9 +193,8 @@
                                                 <i class="bx bx-edit-alt me-1"></i> Sửa
                                             </a>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item text-danger"
-                                                href="index.php?controller=AdminProduct&action=delete&id=<?= $item['id'] ?>"
-                                                onclick="if(<?= $item['status'] ?> == 1) { alert('Sản phẩm đang bán không thể xóa. Vui lòng đổi trạng thái thành CHƯA BÁN trước!'); return false; } else { return confirm('Bạn có chắc chắn muốn xóa bộ Lego này không? Hành động này không thể hoàn tác!'); }">
+                                            <a class="dropdown-item text-danger btn-delete-product" href="javascript:void(0);"
+                                                data-id="<?= $item['id'] ?>" data-name="<?= htmlspecialchars($item['name']) ?>">
                                                 <i class="bx bx-trash me-1"></i> Xóa
                                             </a>
                                         </div>
@@ -201,10 +214,18 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    .swal2-container {
+        z-index: 99999 !important;
+    }
+</style>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-        // === 1. XỬ LÝ CẬP NHẬT TRẠNG THÁI ===
+        // === 1. XỬ LÝ CẬP NHẬT TRẠNG THÁI (AJAX) ===
         const statusSelects = document.querySelectorAll('.update-status-select');
         statusSelects.forEach(select => {
             select.addEventListener('change', function () {
@@ -266,15 +287,84 @@
             });
         }
 
-        // Bắt sự kiện gõ chữ vào ô tìm kiếm
         if (searchInput) {
             searchInput.addEventListener('input', filterTable);
         }
 
-        // Bắt sự kiện bấm các nút chấm tròn trạng thái
         filterRadios.forEach(radio => {
             radio.addEventListener('change', filterTable);
         });
+
+        // === 3. XÁC NHẬN XÓA BẰNG SWEETALERT2 (Sử dụng Event Delegation) ===
+        document.addEventListener('click', function (e) {
+            const deleteBtn = e.target.closest('.btn-delete-product');
+
+            if (deleteBtn) {
+                e.preventDefault();
+
+                const productId = deleteBtn.getAttribute('data-id');
+                const productName = deleteBtn.getAttribute('data-name');
+
+                Swal.fire({
+                    title: 'Bạn có chắc chắn?',
+                    text: `Bạn muốn xóa sản phẩm "${productName}"? Hành động này không thể hoàn tác!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#696cff',
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = `index.php?controller=AdminProduct&action=delete&id=${productId}`;
+                    }
+                });
+            }
+        });
+
+        // === 4. HIỂN THỊ THÔNG BÁO TỪ CONTROLLER ===
+        <?php if (isset($_GET['msg'])): ?>
+
+            <?php if ($_GET['msg'] === 'hidden_due_to_stock'): ?>
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Đã ẩn sản phẩm!',
+                    text: 'Sản phẩm còn tồn kho nên chỉ có thể ẩn',
+                    confirmButtonText: 'Đã hiểu',
+                    confirmButtonColor: '#0dcaf0' // Màu xanh cyan
+                });
+
+            <?php elseif ($_GET['msg'] === 'delete_success'): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Đã xóa hoàn toàn!',
+                    text: 'Sản phẩm chưa nhập hàng nên đã được xóa vĩnh viễn khỏi hệ thống.',
+                    showConfirmButton: false,
+                    timer: 1800
+                });
+
+            <?php elseif ($_GET['msg'] === 'delete_error'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi Database!',
+                    text: 'Không thể xóa sản phẩm này khỏi cơ sở dữ liệu.',
+                    confirmButtonColor: '#696cff'
+                });
+
+            <?php elseif ($_GET['msg'] === 'not_found'): ?>
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Lỗi!',
+                    text: 'Sản phẩm không tồn tại hoặc đã bị xóa trước đó.',
+                    confirmButtonColor: '#696cff'
+                });
+
+            <?php endif; ?>
+
+            // Xóa tham số msg trên URL
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?controller=AdminProduct&action=index";
+            window.history.replaceState({ path: newUrl }, '', newUrl);
+        <?php endif; ?>
 
     });
 </script>

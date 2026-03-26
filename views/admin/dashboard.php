@@ -71,7 +71,7 @@
     <div class="col-12 col-lg-8 order-2 order-md-3 order-lg-2 mb-4">
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between">
-                <h5 class="card-title m-0 me-2">Đơn hàng gần đây</h5>
+                <h5 class="card-title m-0 me-2">Thống kê báo cáo</h5>
             </div>
             <div class="card-body">
                 <ul class="p-0 m-0">

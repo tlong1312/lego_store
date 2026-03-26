@@ -4,13 +4,17 @@ require_once 'BaseModel.php';
 class ProductModel extends BaseModel
 {
 
-    // Hàm thêm sản phẩm mới
-    public function addProduct($theme_id, $sku, $name, $description, $piece_count, $age_range, $image, $stock_quantity, $import_price, $profit_margin, $status)
+    // Hàm thêm sản phẩm mới (ĐÃ CẬP NHẬT: Thêm $low_stock_threshold)
+    public function addProduct($theme_id, $sku, $name, $description, $piece_count, $age_range, $image, $stock_quantity, $import_price, $profit_margin, $status, $low_stock_threshold)
     {
-        $sql = "INSERT INTO products (theme_id, sku, name, description, piece_count, age_range, image, stock_quantity, import_price, profit_margin, status) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // Thêm low_stock_threshold vào câu lệnh INSERT
+        $sql = "INSERT INTO products (theme_id, sku, name, description, piece_count, age_range, image, stock_quantity, import_price, profit_margin, status, low_stock_threshold) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("isssissddii", $theme_id, $sku, $name, $description, $piece_count, $age_range, $image, $stock_quantity, $import_price, $profit_margin, $status);
+        
+        // Cập nhật bind_param: Thêm 1 chữ 'i' vào cuối chuỗi định dạng (thành isssissddiii)
+        $stmt->bind_param("isssissddiii", $theme_id, $sku, $name, $description, $piece_count, $age_range, $image, $stock_quantity, $import_price, $profit_margin, $status, $low_stock_threshold);
+        
         if ($stmt->execute()) {
             return true;
         }
@@ -104,20 +108,21 @@ class ProductModel extends BaseModel
         return false;
     }
 
-    // Hàm cập nhật toàn bộ thông tin sản phẩm
-    public function updateProduct($id, $theme_id, $sku, $name, $description, $piece_count, $age_range, $image, $stock_quantity, $import_price, $profit_margin, $status)
+    // Hàm cập nhật toàn bộ thông tin sản phẩm (ĐÃ CẬP NHẬT: Thêm $low_stock_threshold)
+    public function updateProduct($id, $theme_id, $sku, $name, $description, $piece_count, $age_range, $image, $stock_quantity, $import_price, $profit_margin, $status, $low_stock_threshold)
     {
-
+        // Thêm low_stock_threshold vào câu lệnh UPDATE
         $sql = "UPDATE products SET 
                 theme_id = ?, sku = ?, name = ?, description = ?, 
                 piece_count = ?, age_range = ?, image = ?, 
-                profit_margin = ?, status = ? 
+                profit_margin = ?, status = ?, low_stock_threshold = ? 
                 WHERE id = ?";
 
         $stmt = $this->conn->prepare($sql);
 
+        // Cập nhật bind_param: Thêm chữ 'i' trước id cuối cùng (thành isssissdiii)
         $stmt->bind_param(
-            "isssissdii",
+            "isssissdiii",
             $theme_id,
             $sku,
             $name,
@@ -127,6 +132,7 @@ class ProductModel extends BaseModel
             $image,
             $profit_margin,
             $status,
+            $low_stock_threshold,
             $id
         );
 

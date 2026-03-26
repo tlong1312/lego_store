@@ -53,7 +53,6 @@ class OrderModel extends BaseModel {
 
         // 2. Lọc theo từ khóa (Mã đơn hàng, Tên khách hàng, Số điện thoại)
         if ($keyword !== '') {
-            // Xóa chữ #DH nếu người dùng lỡ gõ vào (VD: #DH001 -> 001 -> 1)
             $clean_keyword = str_ireplace('#DH', '', trim($keyword));
             $id_search = is_numeric($clean_keyword) ? (int)$clean_keyword : 0;
             
@@ -123,6 +122,58 @@ class OrderModel extends BaseModel {
             return $row['total_revenue'] ? $row['total_revenue'] : 0;
         }
         return 0;
+    }
+
+    // Lấy danh sách sản phẩm thuộc về 1 đơn hàng cụ thể
+    public function getOrderItems($order_id) {
+        $sql = "SELECT od.*, p.name, p.image 
+                FROM order_details od 
+                LEFT JOIN products p ON od.product_id = p.id 
+                WHERE od.order_id = ?";
+                
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $order_id);
+        $stmt->execute();
+        
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    // Hàm cập nhật trạng thái đơn hàng
+    public function updateOrderStatus($id, $status)
+    {
+        $sql = "UPDATE orders SET status = ? WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ii", $status, $id);
+        
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
+
+    // Hàm hoàn trả số lượng tồn kho khi hủy đơn hàng
+    public function restoreOrderStock($order_id) {
+        // 1. Lấy danh sách sản phẩm và số lượng từ chi tiết đơn hàng
+        $sql = "SELECT product_id, quantity FROM order_details WHERE order_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $order_id);
+        $stmt->execute();
+        $items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        // 2. Vòng lặp: Lấy từng món cộng trả lại vào bảng products
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $product_id = $item['product_id'];
+                $quantity = $item['quantity'];
+
+                // Dùng phép toán + trực tiếp trong SQL
+                $sqlUpdate = "UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?";
+                $stmtUpdate = $this->conn->prepare($sqlUpdate);
+                $stmtUpdate->bind_param("ii", $quantity, $product_id);
+                $stmtUpdate->execute();
+            }
+        }
+        return true;
     }
 }
 ?>

@@ -79,7 +79,7 @@ class AdminProductController extends BaseController
         }
     }
 
-    // Xử lý lưu 
+    // Xử lý lưu (THÊM MỚI)
     public function store()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -89,15 +89,20 @@ class AdminProductController extends BaseController
             $theme_id = $_POST['theme_id'];
             $piece_count = $_POST['piece_count'];
             $age_range = $_POST['age_range'];
+            
             if ($age_range < 0) {
                 echo "<script>alert('Lỗi: Độ tuổi không được là số âm!'); window.history.back();</script>";
                 exit();
             }
+            
             $stock_quantity = $_POST['stock_quantity'];
             $import_price = 0;
             $profit_margin = $_POST['profit_margin'];
             $status = $_POST['status'];
             $description = $_POST['description'];
+
+            // HỨNG BIẾN MỚI: Ngưỡng sắp hết hàng (Mặc định 5 nếu để trống)
+            $low_stock_threshold = isset($_POST['low_stock_threshold']) && $_POST['low_stock_threshold'] !== '' ? (int)$_POST['low_stock_threshold'] : 5;
 
             // Xử lý upload ảnh
             $imageName = "";
@@ -113,6 +118,8 @@ class AdminProductController extends BaseController
 
             // Gọi Model để lưu vào DB
             $productModel = new ProductModel();
+            
+            // LƯU Ý: Bạn cần đảm bảo hàm addProduct trong ProductModel.php ĐÃ ĐƯỢC CẬP NHẬT để nhận biến $low_stock_threshold này
             $isSuccess = $productModel->addProduct(
                 $theme_id,
                 $sku,
@@ -124,7 +131,8 @@ class AdminProductController extends BaseController
                 $stock_quantity,
                 $import_price,
                 $profit_margin,
-                $status
+                $status,
+                $low_stock_threshold // Thêm biến này vào cuối
             );
 
             if ($isSuccess) {
@@ -168,15 +176,20 @@ class AdminProductController extends BaseController
             $theme_id = $_POST['theme_id'];
             $piece_count = $_POST['piece_count'];
             $age_range = $_POST['age_range'];
+            
             if ($age_range < 0) {
                 echo "<script>alert('Lỗi: Độ tuổi không được là số âm!'); window.history.back();</script>";
                 exit();
             }
+            
             $stock_quantity = $_POST['stock_quantity'];
             $import_price = $_POST['import_price'];
             $profit_margin = $_POST['profit_margin'];
             $status = $_POST['status'];
             $description = $_POST['description'];
+            
+            // HỨNG BIẾN MỚI: Ngưỡng sắp hết hàng (Mặc định 5 nếu để trống)
+            $low_stock_threshold = isset($_POST['low_stock_threshold']) && $_POST['low_stock_threshold'] !== '' ? (int)$_POST['low_stock_threshold'] : 5;
 
             $imageName = $_POST['old_image']; // Mặc định lấy tên ảnh cũ
 
@@ -190,6 +203,8 @@ class AdminProductController extends BaseController
 
             // Gọi Model để Update
             $productModel = new ProductModel();
+            
+            // LƯU Ý: Bạn cần đảm bảo hàm updateProduct trong ProductModel.php ĐÃ ĐƯỢC CẬP NHẬT để nhận biến $low_stock_threshold này
             $isSuccess = $productModel->updateProduct(
                 $id,
                 $theme_id,
@@ -202,7 +217,8 @@ class AdminProductController extends BaseController
                 $stock_quantity,
                 $import_price,
                 $profit_margin,
-                $status
+                $status,
+                $low_stock_threshold // Thêm biến này vào cuối
             );
 
             if ($isSuccess) {
@@ -221,38 +237,46 @@ class AdminProductController extends BaseController
             $id = $_GET['id'];
             $productModel = new ProductModel();
 
-            // 1. Lấy thông tin sản phẩm
             $product = $productModel->getProductById($id);
 
             if ($product) {
+                $currentStock = isset($product['stock_quantity']) ? (int) $product['stock_quantity'] : 0;
 
-                // Kiểm tra xem sản phẩm có đang bán không
+                // 2. KIỂM TRA TỒN KHO
+                if ($currentStock > 0) {
+                    $productModel->updateStatus($id, 0);
 
-                if ($product['status'] == 1) {
-
-                    echo "<script>alert('Sản phẩm đang bán không thể xóa. Vui lòng chuyển trạng thái sang CHƯA BÁN trước khi xóa!'); window.history.back();</script>";
+                    header("Location: index.php?controller=AdminProduct&action=index&msg=hidden_due_to_stock");
                     exit();
-                }
 
-                if (!empty($product['image'])) {
-                    $imagePath = "public/admin/assets/images/" . $product['image'];
-                    if (file_exists($imagePath)) {
-                        unlink($imagePath);
+                } else {
+                    // NẾU CHƯA NHẬP HÀNG (Tồn kho = 0): Tiến hành xóa vĩnh viễn
+
+                    // Xóa file ảnh vật lý
+                    if (!empty($product['image'])) {
+                        $imagePath = "public/admin/assets/images/" . $product['image']; // Đã sửa lại đường dẫn cho khớp với thư mục ở hàm upload
+                        if (file_exists($imagePath)) {
+                            unlink($imagePath);
+                        }
+                    }
+
+                    $isSuccess = $productModel->deleteProduct($id);
+
+                    if ($isSuccess) {
+                        header("Location: index.php?controller=AdminProduct&action=index&msg=delete_success");
+                        exit();
+                    } else {
+                        header("Location: index.php?controller=AdminProduct&action=index&msg=delete_error");
+                        exit();
                     }
                 }
-
-                // 3. Xóa dữ liệu trong Database
-                $isSuccess = $productModel->deleteProduct($id);
-
-                if ($isSuccess) {
-                    header("Location: index.php?controller=AdminProduct&action=index&msg=deleted");
-                    exit();
-                } else {
-                    echo "<script>alert('Lỗi: Không thể xóa sản phẩm này khỏi cơ sở dữ liệu!'); window.history.back();</script>";
-                }
             } else {
-                echo "<script>alert('Sản phẩm không tồn tại!'); window.history.back();</script>";
+                header("Location: index.php?controller=AdminProduct&action=index&msg=not_found");
+                exit();
             }
+        } else {
+            header("Location: index.php?controller=AdminProduct&action=index");
+            exit();
         }
     }
 

@@ -69,6 +69,19 @@
                                 <div class="form-text">Giá bán sẽ tự động tính dựa trên giá nhập và tỉ lệ này.</div>
                             </div>
 
+                            <div class="col-md-6 mb-3">
+                                <label for="low_stock_threshold" class="form-label fw-semibold">Ngưỡng báo "Sắp hết
+                                    hàng"</label>
+                                <div class="input-group input-group-merge">
+                                    <span class="input-group-text"><i class="bx bx-bell"></i></span>
+                                    <input type="number" id="low_stock_threshold" name="low_stock_threshold"
+                                        class="form-control" placeholder="Mặc định: 5" min="0"
+                                        value="<?= isset($product['low_stock_threshold']) ? $product['low_stock_threshold'] : '5' ?>">
+                                </div>
+                                 <div class="form-text">Hệ thống cảng báo khi số lượng tồn kho bằng hoặc thấp
+                                    hơn mức này.</div>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label" for="status">Trạng thái</label>
                                 <select id="status" class="form-select" name="status">

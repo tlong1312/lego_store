@@ -40,12 +40,13 @@ class ReceiptModel extends BaseModel
         return $stmt->get_result()->fetch_assoc();
     }
 
-    // 4. Lấy danh sách chi tiết các sản phẩm trong 1 phiếu nhập
+    // 4. Lấy danh sách chi tiết các sản phẩm trong 1 phiếu nhập (ĐÃ SỬA THÀNH LEFT JOIN)
     public function getReceiptDetails($receipt_id)
     {
+        // Dùng LEFT JOIN: Lấy toàn bộ chi tiết, nếu product bị xóa thì name, sku, image sẽ là NULL
         $sql = "SELECT d.*, p.name, p.sku, p.image 
                 FROM receipt_details d 
-                JOIN products p ON d.product_id = p.id 
+                LEFT JOIN products p ON d.product_id = p.id 
                 WHERE d.receipt_id = ? ORDER BY d.id DESC";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $receipt_id);
@@ -96,7 +97,6 @@ class ReceiptModel extends BaseModel
         // Cấm chốt nếu phiếu rỗng
         if (empty($details))
             return false;
-
 
         // Đổi trạng thái phiếu thành 1 
         $sqlStatus = "UPDATE receipts SET status = 1 WHERE id = ?";

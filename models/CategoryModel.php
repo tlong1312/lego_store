@@ -88,5 +88,20 @@ class CategoryModel extends BaseModel
 
         return $result->num_rows > 0;
     }
+
+    public function checkActiveProducts($category_id) {
+        $sql = "SELECT COUNT(id) AS total FROM products WHERE theme_id = ? AND status = 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $category_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            // Nếu có ít nhất 1 sản phẩm đang bán, trả về true (Có)
+            return $row['total'] > 0;
+        }
+        return false;
+    }
 }
 ?>
