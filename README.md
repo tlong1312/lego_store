@@ -83,16 +83,6 @@ A standout feature of this system is the **Weighted Average Inventory Pricing**.
    - Access the client portal via `http://localhost/lego_store/`
    - Access the admin portal via `http://localhost/lego_store/index.php?controller=dashboard&action=index`
 
-## 📸 Screenshots
-
-### Client Interface
-*(Add your screenshot of the homepage or registration form here)*
-![Register Form](#)
-
-### Smart Validation & Notifications
-*(Add your screenshot of the SweetAlert notification here)*
-![SweetAlert Notification](#)
-
 ## 👨‍💻 Team Members
 
 | STT | Student ID (MSSV) | Full Name (Họ Tên) | Role / Tasks (Nhiệm vụ) | Contribution (%) |
