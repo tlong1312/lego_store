@@ -3,11 +3,11 @@ require_once 'BaseModel.php';
 
 class OrderModel extends BaseModel {
 
-    public function createOrder($user_id, $fullname, $phone, $address, $total_money, $payment_method) {
-        $sql = "INSERT INTO orders (user_id, fullname, phone, shipping_address, total_money, payment_method, status) 
-                VALUES (?, ?, ?, ?, ?, ?, 0)";
+    public function createOrder($user_id, $fullname, $phone, $address, $ward, $province, $total_money, $payment_method) {
+        $sql = "INSERT INTO orders (user_id, fullname, phone, shipping_address, shipping_ward, shipping_province, total_money, payment_method, status) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("isssds", $user_id, $fullname, $phone, $address, $total_money, $payment_method);
+        $stmt->bind_param("isssssds", $user_id, $fullname, $phone, $address, $ward, $province, $total_money, $payment_method);
         
         if ($stmt->execute()) {
             return $this->conn->insert_id;
@@ -174,6 +174,25 @@ class OrderModel extends BaseModel {
             }
         }
         return true;
+    }
+
+    public function getOrderByIdAndUser($order_id, $user_id) {
+        $sql = "SELECT * FROM orders WHERE id = ? AND user_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ii", $order_id, $user_id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    }
+
+    public function getOrderDetailsById($order_id) {
+        $sql = "SELECT od.*, p.name, p.image 
+                FROM order_details od 
+                JOIN products p ON od.product_id = p.id 
+                WHERE od.order_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $order_id);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 }
 ?>

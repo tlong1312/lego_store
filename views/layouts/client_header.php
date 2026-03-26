@@ -26,9 +26,9 @@
 
 <body>
     <!-- Page Preloder -->
-    <div id="preloder">
+    <!-- <div id="preloder">
         <div class="loader"></div>
-    </div>
+    </div> -->
 
     <!-- Offcanvas Menu Begin (Menu Mobile) -->
     <div class="offcanvas-menu-overlay"></div>
@@ -40,23 +40,14 @@
                 <?php else: ?>
                     <a href="index.php?controller=auth&action=login">Đăng nhập</a>
                 <?php endif; ?>
-                <a href="#">Hỏi đáp</a>
             </div>
-            <div class="offcanvas__top__hover">
-                <span>VND <i class="arrow_carrot-down"></i></span>
-                <ul>
-                    <li>VND</li>
-                    <li>USD</li>
-                </ul>
-            </div>
+
         </div>
         <div class="offcanvas__nav__option">
             <a href="#" class="search-switch"><img src="public/client/img/icon/search.png" alt=""></a>
-            <a href="#"><img src="public/client/img/icon/heart.png" alt=""></a>
             <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
                 <a href="index.php?controller=cart&action=index"><img src="public/client/img/icon/cart.png" alt="">
                     <span>0</span></a>
-                <div class="price">0đ</div>
             <?php endif; ?>
         </div>
         <div id="mobile-menu-wrap"></div>
@@ -86,7 +77,6 @@
                                     <a href="index.php?controller=auth&action=login">Đăng nhập</a>
                                     <a href="index.php?controller=auth&action=register">Đăng ký</a>
                                 <?php endif; ?>
-                                <a href="#">Hỏi đáp</a>
                             </div>
 
                         </div>
@@ -104,10 +94,19 @@
                 </div>
                 <div class="col-lg-6 col-md-6">
                     <nav class="header__menu mobile-menu">
+                        <?php
+                        $current_controller = $_GET['controller'] ?? 'home';
+                        $utility_controllers = ['cart', 'auth'];
+                        ?>
                         <ul>
-                            <li class="active"><a href="index.php?controller=home&action=index">Trang Chủ</a></li>
-                            <li><a href="index.php?controller=product&action=index">Sản Phẩm</a></li>
-                            <li><a href="#">Tiện Ích</a>
+                            <li class="<?= ($current_controller == 'home') ? 'active' : '' ?>">
+                                <a href="index.php?controller=home&action=index">Trang Chủ</a>
+                            </li>
+                            <li class="<?= ($current_controller == 'product') ? 'active' : '' ?>">
+                                <a href="index.php?controller=product&action=index">Sản Phẩm</a>
+                            </li>
+                            <li class="<?= (in_array($current_controller, $utility_controllers)) ? 'active' : '' ?>">
+                                <a href="#">Tiện Ích</a>
                                 <ul class="dropdown"
                                     style="min-width: 200px; background: #fff; padding: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
                                     <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
@@ -131,18 +130,20 @@
                                         <li style="padding: 8px 15px;" onmouseover="this.style.backgroundColor='#f0f0f0'"
                                             onmouseout="this.style.backgroundColor='transparent'">
                                             <a href="index.php?controller=auth&action=login"
-                                                style="color: #000; display: block; padding: 5px 0;">Đăng nhập</a></li>
+                                                style="color: #000; display: block; padding: 5px 0;">Đăng nhập</a>
+                                        </li>
                                     <?php endif; ?>
                                 </ul>
                             </li>
-                            <li><a href="index.php?controller=contact&action=index">Liên Hệ</a></li>
+                            <li class="<?= ($current_controller == 'contact') ? 'active' : '' ?>">
+                                <a href="index.php?controller=contact&action=index">Liên Hệ</a>
+                            </li>
                         </ul>
                     </nav>
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="header__nav__option">
                         <a href="#" class="search-switch"><img src="public/client/img/icon/search.png" alt=""></a>
-                        <a href="#"><img src="public/client/img/icon/heart.png" alt=""></a>
                         <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
                             <a href="index.php?controller=cart&action=index"><img src="public/client/img/icon/cart.png"
                                     alt=""> <span>0</span></a>

@@ -55,8 +55,9 @@ class ProductController extends BaseController{
         $product = $productModel->getProductById($id);
 
         if (!$product) {
-            echo "<script>alert('Sản phẩm không tồn tại!'); window.location.href='index.php?controller=product&action=index';</script>";
-            return;
+            $_SESSION['flash_type'] = 'info';
+            $_SESSION['flash_msg'] = 'Sản phẩm không tồn tại!';
+            $this->redirect('index.php?controller=product&action=index');
         }
 
         $data['product'] = $product;
@@ -92,18 +93,23 @@ class ProductController extends BaseController{
             $productModel = new ProductModel();
 
             if (!$productModel->checkUserBoughtProduct($user_id, $product_id)) {
-                echo "<script>alert('Bạn phải mua và trải nghiệm sản phẩm này mới được đánh giá nhé!'); window.location.href='index.php?controller=product&action=detail&id=$product_id';</script>";
-                exit();
+                $_SESSION['flash_type'] = 'info';
+                $_SESSION['flash_msg'] = 'Bạn chưa mua sản phẩm này, hoặc đơn hàng của bạn đang trong quá trình xử lý/giao hàng. Vui lòng thử lại sau khi đã nhận hàng nhé!';
+                $this->redirect("index.php?controller=product&action=detail&id=$product_id");
+                
             }
 
             if ($productModel->checkUserReviewed($user_id, $product_id)) {
-                echo "<script>alert('Bạn đã đánh giá sản phẩm này rồi. Cảm ơn bạn!'); window.location.href='index.php?controller=product&action=detail&id=$product_id';</script>";
-                exit();
+                $_SESSION['flash_type'] = 'info';
+                $_SESSION['flash_msg'] = 'Bạn đã đánh giá sản phẩm này rồi. Cảm ơn bạn!';
+                $this->redirect("index.php?controller=product&action=detail&id=$product_id");
             }
 
             if ($product_id > 0 && !empty($comment)) {
                 $productModel->addReview($product_id, $user_id, $rating, $comment);
-                echo "<script>alert('Gửi đánh giá thành công! Cảm ơn bạn.'); window.location.href='index.php?controller=product&action=detail&id=$product_id';</script>";
+                $_SESSION['flash_type'] = 'success';
+                $_SESSION['flash_msg'] = 'Gửi đánh giá thành công! Cảm ơn bạn.';
+                $this->redirect("index.php?controller=product&action=detail&id=$product_id");
             }
         } else {
             $this->redirect('index.php?controller=auth&action=login');

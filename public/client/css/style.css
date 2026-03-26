@@ -4057,3 +4057,18 @@ ol {
 		height: 250px;
 	}
 }
+
+/* CSS cho sản phẩm hết hàng */
+.product__item.sold-out-item .product__item__pic {
+    opacity: 0.6;
+}
+
+.product__item .add-cart.disabled-cart {
+    background: #b2b2b2;
+    color: #ffffff;
+    cursor: not-allowed;
+}
+
+.product__item .add-cart.disabled-cart:hover {
+    background: #b2b2b2; /* Giữ nguyên màu khi hover */
+}

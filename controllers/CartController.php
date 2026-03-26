@@ -3,7 +3,9 @@ class CartController extends BaseController{
 
     private function checkLogin() {
         if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'customer') {
-            echo "<script>alert('Vui lòng đăng nhập tài khoản Khách hàng để sử dụng giỏ hàng!'); window.location.href='index.php?controller=auth&action=login';</script>";
+            $_SESSION['flash_type'] = 'warning';
+            $_SESSION['flash_msg'] = 'Vui lòng đăng nhập tài khoản Khách hàng để sử dụng giỏ hàng!';
+            $this->redirect('index.php?controller=auth&action=login');
             exit();
         }
     }
@@ -121,7 +123,9 @@ class CartController extends BaseController{
 
             $fullname = $_POST['fullname'];
             $phone = $_POST['phone'];
-            $address = $_POST['address'];
+            $address = $_POST['address']; 
+            $ward = $_POST['ward_name']; 
+            $province = $_POST['province_name']; 
             $payment_method = $_POST['payment_method'];
             $user_id = $_SESSION['user']['id'];
 
@@ -130,7 +134,7 @@ class CartController extends BaseController{
                 $total_amount += $item['price'] * $item['quantity'];
             }
 
-            $order_id = $orderModel->createOrder($user_id, $fullname, $phone, $address, $total_amount, $payment_method);
+            $order_id = $orderModel->createOrder($user_id, $fullname, $phone, $address, $ward, $province, $total_amount, $payment_method);
 
             if ($order_id) {
                 foreach ($_SESSION['cart'] as $item) {
@@ -138,8 +142,9 @@ class CartController extends BaseController{
                     $orderModel->reduceProductStock($item['id'], $item['quantity']);
                 }
                 unset($_SESSION['cart']); 
-                
-                echo "<script>alert('Đặt hàng thành công!'); window.location.href='index.php?controller=cart&action=history';</script>";
+                $_SESSION['flash_type'] = 'success';
+                $_SESSION['flash_msg'] = 'Đặt hàng thành công! Mã đơn của bạn là #' . $order_id;
+                $this->redirect('index.php?controller=cart&action=history');
             }
         }
     }
@@ -154,6 +159,73 @@ class CartController extends BaseController{
         $this->view('layouts/client_header');
         $this->view('client/history', $data);
         $this->view('layouts/client_footer');
+    }
+
+    public function orderDetail() {
+        $this->checkLogin();
+        
+        if (isset($_GET['id'])) {
+            $order_id = (int)$_GET['id'];
+            $user_id = $_SESSION['user']['id'];
+
+            require_once 'models/OrderModel.php';
+            $orderModel = new OrderModel();
+
+            $order = $orderModel->getOrderByIdAndUser($order_id, $user_id);
+            
+            if (!$order) {
+                $this->redirect('index.php?controller=cart&action=history');
+            }
+            
+            $data['order'] = $order;
+            $data['order_details'] = $orderModel->getOrderDetailsById($order_id);
+
+            $this->view('layouts/client_header');
+            $this->view('client/order_detail', $data);
+            $this->view('layouts/client_footer');
+        } else {
+            $this->redirect('index.php?controller=cart&action=history');
+        }
+    }
+
+    public function cancelOrder() {
+        $this->checkLogin();
+        
+        if (isset($_GET['id'])) {
+            $order_id = (int)$_GET['id'];
+            $user_id = $_SESSION['user']['id'];
+
+            require_once 'models/OrderModel.php';
+            $orderModel = new OrderModel();
+            $order = $orderModel->getOrderByIdAndUser($order_id, $user_id);
+            
+            if ($order && $order['status'] == 0) {
+                $orderModel->beginTransaction();
+
+                try {
+                    $orderModel->restoreOrderStock($order_id);
+                    $orderModel->updateOrderStatus($order_id, 3);
+                    $orderModel->commit();
+
+                    $_SESSION['flash_type'] = 'success';
+                    $_SESSION['flash_msg'] = 'Đã hủy thành công đơn hàng #' . $order_id;
+
+                } catch (Exception $e) {
+                    $orderModel->rollback();
+                    $_SESSION['flash_type'] = 'error';
+                    $_SESSION['flash_msg'] = 'Hủy đơn hàng thất bại, đã có lỗi xảy ra: ' . $e->getMessage();
+                }
+
+            } else {
+                $_SESSION['flash_type'] = 'error';
+                $_SESSION['flash_msg'] = 'Không thể hủy đơn hàng này hoặc đơn hàng không tồn tại.';
+            }
+
+            $this->redirect('index.php?controller=cart&action=history');
+
+        } else {
+            $this->redirect('index.php?controller=cart&action=history');
+        }
     }
 }
 ?>

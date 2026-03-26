@@ -5,10 +5,10 @@
             <div class="col-lg-3 col-md-6 col-sm-6">
                 <div class="footer__about">
                     <div class="footer__logo">
-                        <a href="./home.php"><img src="public/client/img/logo.png" alt=""></a>
+                        <a href="index.php?controller=home&action=index"><img src="public/client/img/logo.png" alt=""></a>
                     </div>
                     <p>Thế giới LEGO chính hãng - Nơi khơi nguồn sáng tạo và niềm vui lắp ráp cho mọi lứa tuổi.</p>
-                    <a href="#"><img src="public/client/img/payment.png" alt=""></a>
+                    <a href="index.php?controller=cart&action=checkout"><img src="public/client/img/payment.png" alt=""></a>
                 </div>
             </div>
 
@@ -16,10 +16,10 @@
                 <div class="footer__widget">
                     <h6>Sản Phẩm Hot</h6>
                     <ul>
-                        <li><a href="#">LEGO Technic</a></li>
-                        <li><a href="#">LEGO Star Wars</a></li>
-                        <li><a href="#">LEGO City</a></li>
-                        <li><a href="#">LEGO Ninjago</a></li>
+                        <li><a href="index.php?controller=product&action=index&category_id=1">LEGO Technic</a></li>
+                        <li><a href="index.php?controller=product&action=index&category_id=2">LEGO Star Wars</a></li>
+                        <li><a href="index.php?controller=product&action=index&category_id=4">LEGO City</a></li>
+                        <li><a href="index.php?controller=product&action=index&category_id=3">LEGO Harry Potter</a></li>
                     </ul>
                 </div>
             </div>
@@ -28,11 +28,10 @@
                 <div class="footer__widget">
                     <h6>Hỗ Trợ</h6>
                     <ul>
-                        <li><a href="./contact.php">Liên Hệ</a></li>
-                        <li><a href="#">Thanh Toán</a></li>
-                        <li><a href="#">Chính Sách Giao Hàng</a></li>
-                        <li><a href="#">Đổi Trả & Bảo Hành</a></li>
-                    </ul>
+            <li><a href="index.php?controller=contact&action=index">Liên Hệ</a></li>
+            <li><a href="javascript:void(0);" style="cursor: default; color: #b2b2b2;">Chính Sách Giao Hàng</a></li>
+            <li><a href="javascript:void(0);" style="cursor: default; color: #b2b2b2;">Đổi Trả & Bảo Hành</a></li>
+        </ul>
                 </div>
             </div>
 
@@ -41,7 +40,7 @@
                     <h6>Bản Tin</h6>
                     <div class="footer__newslatter">
                         <p>Nhận thông tin về các bộ LEGO mới nhất và ưu đãi đặc biệt!</p>
-                        <form action="#">
+                        <form action="javascript:void(0);">
                             <input type="text" placeholder="Email của bạn...">
                             <button type="submit"><span class="icon_mail_alt"></span></button>
                         </form>
@@ -93,6 +92,94 @@
 <script src="public/client/js/mixitup.min.js"></script>
 <script src="public/client/js/owl.carousel.min.js"></script>
 <script src="public/client/js/main.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    #scrollTopBtn {
+        display: none; 
+        position: fixed;
+        bottom: 20px;
+        right: 30px;
+        z-index: 99;
+        border: none;
+        outline: none;
+        background-color: #e53637; 
+        color: white;
+        cursor: pointer;
+        width: 50px;
+        height: 50px;
+        border-radius: 4px;
+        font-size: 24px;
+        line-height: 50px; 
+        text-align: center; 
+        transition: all 0.3s ease;
+    }
+
+    #scrollTopBtn:hover {
+        background-color: #111; 
+    }
+</style>
+<a id="scrollTopBtn" title="Lên trên cùng"><i class="fa fa-angle-up"></i></a>
+<script>
+    var scrollTopButton = document.getElementById("scrollTopBtn");
+
+    window.onscroll = function() {
+        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+            scrollTopButton.style.display = "block";
+        } else {
+            scrollTopButton.style.display = "none";
+        }
+    };
+
+    scrollTopButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.cancel-order-btn').forEach(function(button) {
+        button.addEventListener('click', function (event) {
+            event.preventDefault(); 
+            
+            const cancelUrl = this.href;
+            const orderId = new URL(cancelUrl).searchParams.get("id");
+
+            Swal.fire({
+                title: 'Bạn chắc chắn muốn hủy?',
+                text: "Đơn hàng #" + orderId + " sẽ bị hủy và không thể hoàn tác!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Đồng ý hủy',
+                cancelButtonText: 'Không'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = cancelUrl;
+                }
+            });
+        });
+    });
+});
+</script>
+    <?php if (isset($_SESSION['flash_msg'])): ?>
+        <script>
+            Swal.fire({
+                icon: '<?= $_SESSION['flash_type'] ?>', 
+                title: 'Thông báo',
+                text: '<?= $_SESSION['flash_msg'] ?>',
+                timer: 3000, 
+                showConfirmButton: false, 
+                toast: true, 
+                position: 'top-end' 
+            });
+        </script>
+        <?php 
+        unset($_SESSION['flash_msg']); 
+        unset($_SESSION['flash_type']); 
+        ?>
+    <?php endif; ?>
 </body>
 
 </html>

@@ -97,33 +97,44 @@
         <div class="row">
             <div class="col-lg-12">
                 <ul class="filter__controls">
-                    <li data-filter=".new-arrivals">Hàng Mới Về</li>
+                    <li class="active" data-filter=".new-arrivals">Hàng Mới Về</li>
                 </ul>
             </div>
         </div>
         <div class="row product__filter">
             <?php foreach ($latest_products as $product): ?>
-                <?php
-                $gia_ban = $product['import_price'] * (1 + $product['profit_margin'] / 100);
-                ?>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-md-6 col-sm-6 mix new-arrivals">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg"
-                            data-setbg="public/client/img/product/<?= htmlspecialchars($product['image']) ?>">
-                            <ul class="product__hover">
-                                <li><a href="#"><img src="public/client/img/icon/heart.png" alt=""></a></li>
-                                <li><a href="#"><img src="public/client/img/icon/search.png" alt=""> </a></li>
-                            </ul>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><?= htmlspecialchars($product['name']) ?></h6>
-                            <a href="index.php?controller=product&action=detail&id=<?= $product['id'] ?>" class="add-cart">+
-                                Thêm Vào Giỏ</a>
-                            <h5><?= number_format($gia_ban, 0, ',', '.') ?>đ</h5>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+    <?php
+        $gia_ban = $product['import_price'] * (1 + $product['profit_margin'] / 100);
+        $is_out_of_stock = ($product['stock_quantity'] <= 0);
+    ?>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-md-6 col-sm-6 mix new-arrivals">
+        <div class="product__item <?= $is_out_of_stock ? 'sold-out-item' : '' ?>">
+            <div class="product__item__pic set-bg"
+                data-setbg="public/client/img/product/<?= htmlspecialchars($product['image']) ?>">
+
+                <?php if ($is_out_of_stock): ?>
+                    <span class="label" style="background: #111; color: #fff;">Hết hàng</span>
+                <?php endif; ?>
+
+                <ul class="product__hover">
+                    <li><a href="#"><img src="public/client/img/icon/heart.png" alt=""></a></li>
+                    <li><a href="#"><img src="public/client/img/icon/search.png" alt=""> </a></li>
+                </ul>
+            </div>
+            <div class="product__item__text">
+                <h6><?= htmlspecialchars($product['name']) ?></h6>
+
+                <?php if ($is_out_of_stock): ?>
+                    <a href="javascript:void(0)" class="add-cart disabled-cart">+ Hết hàng</a>
+                <?php else: ?>
+                    <a href="index.php?controller=product&action=detail&id=<?= $product['id'] ?>" class="add-cart">+ Thêm Vào Giỏ</a>
+                <?php endif; ?>
+
+                <h5><?= number_format($gia_ban, 0, ',', '.') ?>đ</h5>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>
         </div>
     </div>
 </section>
