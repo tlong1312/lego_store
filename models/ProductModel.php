@@ -4,15 +4,15 @@ require_once 'BaseModel.php';
 class ProductModel extends BaseModel
 {
 
-    // Hàm thêm sản phẩm mới (ĐÃ CẬP NHẬT: Thêm $low_stock_threshold)
+     
     public function addProduct($theme_id, $sku, $name, $description, $piece_count, $age_range, $image, $stock_quantity, $import_price, $profit_margin, $status, $low_stock_threshold)
     {
-        // Thêm low_stock_threshold vào câu lệnh INSERT
+         
         $sql = "INSERT INTO products (theme_id, sku, name, description, piece_count, age_range, image, stock_quantity, import_price, profit_margin, status, low_stock_threshold) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
         
-        // Cập nhật bind_param: Thêm 1 chữ 'i' vào cuối chuỗi định dạng (thành isssissddiii)
+         
         $stmt->bind_param("isssissddiii", $theme_id, $sku, $name, $description, $piece_count, $age_range, $image, $stock_quantity, $import_price, $profit_margin, $status, $low_stock_threshold);
         
         if ($stmt->execute()) {
@@ -66,7 +66,7 @@ class ProductModel extends BaseModel
         return $result->fetch_assoc();
     }
 
-    // Hàm lấy tất cả sản phẩm 
+     
     public function getAllProducts()
     {
         $sql = "SELECT p.*, t.name AS category_name 
@@ -84,7 +84,7 @@ class ProductModel extends BaseModel
         return $products;
     }
 
-    // Hàm cập nhật số lượng tồn kho nhanh
+     
     public function updateStock($id, $stock_quantity)
     {
         $sql = "UPDATE products SET stock_quantity = ? WHERE id = ?";
@@ -96,7 +96,7 @@ class ProductModel extends BaseModel
         return false;
     }
 
-    // Hàm cập nhật trạng thái ẩn/hiện sản phẩm
+     
     public function updateStatus($id, $status)
     {
         $sql = "UPDATE products SET status = ? WHERE id = ?";
@@ -108,10 +108,10 @@ class ProductModel extends BaseModel
         return false;
     }
 
-    // Hàm cập nhật toàn bộ thông tin sản phẩm (ĐÃ CẬP NHẬT: Thêm $low_stock_threshold)
+     
     public function updateProduct($id, $theme_id, $sku, $name, $description, $piece_count, $age_range, $image, $stock_quantity, $import_price, $profit_margin, $status, $low_stock_threshold)
     {
-        // Thêm low_stock_threshold vào câu lệnh UPDATE
+         
         $sql = "UPDATE products SET 
                 theme_id = ?, sku = ?, name = ?, description = ?, 
                 piece_count = ?, age_range = ?, image = ?, 
@@ -120,7 +120,7 @@ class ProductModel extends BaseModel
 
         $stmt = $this->conn->prepare($sql);
 
-        // Cập nhật bind_param: Thêm chữ 'i' trước id cuối cùng (thành isssissdiii)
+         
         $stmt->bind_param(
             "isssissdiii",
             $theme_id,
@@ -142,7 +142,7 @@ class ProductModel extends BaseModel
         return false;
     }
 
-    // Hàm xóa sản phẩm theo ID
+     
     public function deleteProduct($id)
     {
         $sql = "DELETE FROM products WHERE id = ?";
@@ -155,7 +155,7 @@ class ProductModel extends BaseModel
         return false;
     }
 
-    // Hàm tìm kiếm sản phẩm (Có JOIN lấy tên danh mục)
+     
     public function searchProductsByName($keyword)
     {
         $sql = "SELECT p.*, t.name AS category_name 
@@ -182,7 +182,7 @@ class ProductModel extends BaseModel
     public function updateStockAndPriceAfterImport($product_id, $new_import_qty, $new_import_price)
     {
 
-        // 1. Lấy thông tin Tồn kho cũ và Giá nhập cũ từ DB
+         
         $sql_get = "SELECT stock_quantity, import_price FROM products WHERE id = ?";
         $stmt_get = $this->conn->prepare($sql_get);
         $stmt_get->bind_param("i", $product_id);
@@ -193,17 +193,17 @@ class ProductModel extends BaseModel
             $current_stock = (int) $product['stock_quantity'];
             $current_import_price = (float) $product['import_price'];
 
-            // 2. TÍNH TOÁN BÌNH QUÂN
+             
             $total_stock = $current_stock + $new_import_qty;
 
             if ($total_stock > 0) {
-                // Công thức: (Tồn cũ * Giá cũ + Nhập mới * Giá mới) / Tổng số lượng
+                 
                 $new_avg_import_price = (($current_stock * $current_import_price) + ($new_import_qty * $new_import_price)) / $total_stock;
             } else {
                 $new_avg_import_price = $new_import_price;
             }
 
-            // 3. Cập nhật lại Tồn kho và Giá nhập bình quân vào Database
+             
             $sql_update = "UPDATE products SET stock_quantity = ?, import_price = ? WHERE id = ?";
             $stmt_update = $this->conn->prepare($sql_update);
             $stmt_update->bind_param("idi", $total_stock, $new_avg_import_price, $product_id);
@@ -331,6 +331,114 @@ class ProductModel extends BaseModel
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("iiis", $product_id, $user_id, $rating, $comment);
         return $stmt->execute();
+    }
+
+     
+    public function getHistoricalStock($productId, $targetDate) 
+    {
+        $endOfDay = $targetDate . ' 23:59:59';
+
+         
+        $sqlImport = "SELECT SUM(rd.quantity) as total_in 
+                      FROM receipt_details rd 
+                      JOIN receipts r ON rd.receipt_id = r.id 
+                      WHERE rd.product_id = ? AND r.status = 1 AND r.created_at <= ?";
+                      
+        $stmtIn = $this->conn->prepare($sqlImport);
+        $stmtIn->bind_param("is", $productId, $endOfDay);
+        $stmtIn->execute();
+        $resultIn = $stmtIn->get_result()->fetch_assoc();
+        
+        $totalIn = $resultIn['total_in'] ? (int)$resultIn['total_in'] : 0;
+
+         
+        $sqlExport = "SELECT SUM(od.quantity) as total_out 
+                      FROM order_details od 
+                      JOIN orders o ON od.order_id = o.id 
+                      WHERE od.product_id = ? AND o.status != 3 AND o.created_at <= ?";
+                      
+        $stmtOut = $this->conn->prepare($sqlExport);
+        $stmtOut->bind_param("is", $productId, $endOfDay);
+        $stmtOut->execute();
+        $resultOut = $stmtOut->get_result()->fetch_assoc();
+        
+        $totalOut = $resultOut['total_out'] ? (int)$resultOut['total_out'] : 0;
+
+         
+        $historicalStock = $totalIn - $totalOut;
+        
+        return $historicalStock > 0 ? $historicalStock : 0;
+    }
+
+     
+    public function getImportExportReport($productId, $startDate, $endDate) 
+    {
+        $startOfDay = $startDate . ' 00:00:00';
+        $endOfDay = $endDate . ' 23:59:59';
+
+        $sqlImport = "SELECT SUM(rd.quantity) as total_in 
+                      FROM receipt_details rd 
+                      JOIN receipts r ON rd.receipt_id = r.id 
+                      WHERE rd.product_id = ? AND r.status = 1 
+                      AND r.created_at >= ? AND r.created_at <= ?";
+        $stmtIn = $this->conn->prepare($sqlImport);
+        $stmtIn->bind_param("iss", $productId, $startOfDay, $endOfDay);
+        $stmtIn->execute();
+        $resultIn = $stmtIn->get_result()->fetch_assoc();
+        $totalIn = $resultIn['total_in'] ? (int)$resultIn['total_in'] : 0;
+
+        $sqlExport = "SELECT SUM(od.quantity) as total_out 
+                      FROM order_details od 
+                      JOIN orders o ON od.order_id = o.id 
+                      WHERE od.product_id = ? AND o.status != 3 
+                      AND o.created_at >= ? AND o.created_at <= ?";
+        $stmtOut = $this->conn->prepare($sqlExport);
+        $stmtOut->bind_param("iss", $productId, $startOfDay, $endOfDay);
+        $stmtOut->execute();
+        $resultOut = $stmtOut->get_result()->fetch_assoc();
+        $totalOut = $resultOut['total_out'] ? (int)$resultOut['total_out'] : 0;
+
+        return [
+            'total_in' => $totalIn,
+            'total_out' => $totalOut
+        ];
+    }
+
+    public function getProfitByBatch($productId = '') 
+    {
+        $sql = "SELECT 
+                    r.id as receipt_id, 
+                    r.created_at as import_date, 
+                    p.name as product_name, 
+                    rd.quantity, 
+                    rd.remain_quantity,
+                    rd.import_price as cost_price, 
+                    p.profit_margin,
+                    (rd.import_price + (rd.import_price * p.profit_margin / 100)) as selling_price 
+                FROM receipt_details rd
+                JOIN receipts r ON rd.receipt_id = r.id
+                JOIN products p ON rd.product_id = p.id
+                WHERE r.status = 1"; 
+
+        $params = [];
+        $types = "";
+
+        if (!empty($productId)) {
+            $sql .= " AND p.id = ?";
+            $types .= "i";
+            $params[] = (int)$productId;
+        }
+
+        $sql .= " ORDER BY r.created_at DESC";
+
+        $stmt = $this->conn->prepare($sql);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 }
 ?>

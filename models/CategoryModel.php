@@ -40,7 +40,7 @@ class CategoryModel extends BaseModel
     }
 
 
-    // 1. Lấy chi tiết 1 danh mục để đổ dữ liệu ra form Sửa
+     
     public function getCategoryById($id)
     {
         $sql = "SELECT * FROM themes WHERE id = ?";
@@ -51,7 +51,7 @@ class CategoryModel extends BaseModel
         return $result->fetch_assoc();
     }
 
-    // 2. Thêm danh mục mới
+     
     public function addCategory($name)
     {
         $sql = "INSERT INTO themes (name) VALUES (?)";
@@ -60,7 +60,7 @@ class CategoryModel extends BaseModel
         return $stmt->execute();
     }
 
-    // 3. Cập nhật tên danh mục
+     
     public function updateCategory($id, $name)
     {
         $sql = "UPDATE themes SET name = ? WHERE id = ?";
@@ -71,7 +71,7 @@ class CategoryModel extends BaseModel
 
     public function checkNameExists($name, $ignore_id = null)
     {
-        // Tìm xem có danh mục nào tên giống hệt như vậy không
+         
         $sql = "SELECT id FROM themes WHERE name = ?";
 
         if ($ignore_id !== null) {
@@ -98,7 +98,7 @@ class CategoryModel extends BaseModel
         
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            // Nếu có ít nhất 1 sản phẩm đang bán, trả về true (Có)
+             
             return $row['total'] > 0;
         }
         return false;

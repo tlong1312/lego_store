@@ -36,7 +36,7 @@
             <table class="table table-hover">
                 <thead class="table-light">
                     <tr>
-                        <th style="width: 100px;">Mã Phiếu</th>
+                        <th style="width: 150px;">Mã Phiếu</th>
                         <th>Người Lập</th>
                         <th class="text-end">Tổng Tiền</th>
                         <th class="text-center">Ngày Nhập</th>
@@ -99,6 +99,12 @@
                 </tbody>
             </table>
         </div>
+        <div class="d-flex justify-content-between align-items-center mt-3 mb-0">
+            <span class="text-muted">
+                <strong>Thống kê:</strong> Đã tạo <b><?= $totalReceipts ?></b> phiếu nhập.
+                Trong đó, <b><?= $completedReceipts ?></b> phiếu đã hoàn thành.
+            </span>
+        </div>
     </div>
 </div>
 
@@ -116,13 +122,13 @@
             let formattedDate = "";
             if (selectedDate) {
                 const [year, month, day] = selectedDate.split('-');
-                formattedDate = `${day}/${month}/${year}`; // VD: 17/03/2026
+                formattedDate = `${day}/${month}/${year}`;  
             }
 
             receiptRows.forEach(row => {
                 const idText = row.querySelector('td:nth-child(1)').innerText.toLowerCase();
                 const creatorText = row.querySelector('td:nth-child(2)').innerText.toLowerCase();
-                const dateText = row.querySelector('td:nth-child(4)').innerText; // Chứa d/m/Y H:i
+                const dateText = row.querySelector('td:nth-child(4)').innerText;  
 
                 const isMatchKeyword = idText.includes(keyword) || creatorText.includes(keyword);
 

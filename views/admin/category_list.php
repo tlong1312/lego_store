@@ -82,7 +82,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-    /* Ép lớp nền của popup luôn nằm trên cùng, đè lên thanh navbar và bảng */
+     
     .swal2-container {
         z-index: 99999 !important;
     }
@@ -91,7 +91,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         
-        // --- 1. TÍNH NĂNG TÌM KIẾM LIVE SEARCH ---
+         
         const searchInput = document.getElementById('searchInput');
         const categoryRows = document.querySelectorAll('.category-row');
         const noResultsRow = document.getElementById('noResultsRow');
@@ -122,7 +122,7 @@
             });
         }
 
-        // --- 2. TÍNH NĂNG XÓA---
+         
         const deleteButtons = document.querySelectorAll('.btn-delete-category');
         
         deleteButtons.forEach(button => {
@@ -149,7 +149,7 @@
             });
         });
 
-        // --- 3. BẮT LỖI TỪ URL ĐỂ HIỆN POPUP THÔNG BÁO ---
+         
         <?php if (isset($_GET['msg'])): ?>
             <?php if ($_GET['msg'] === 'error_has_products'): ?>
                 Swal.fire({
@@ -176,7 +176,7 @@
                 });
             <?php endif; ?>
             
-            // Xóa tham số msg trên URL để F5 không bị hiện lại popup
+             
             const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?controller=AdminCategory&action=index";
             window.history.replaceState({path: newUrl}, '', newUrl);
         <?php endif; ?>

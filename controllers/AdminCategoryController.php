@@ -20,7 +20,7 @@ class AdminCategoryController extends BaseController
         require_once 'views/layouts/admin_footer.php';
     }
 
-    // 1. Hiển thị form Thêm mới
+     
     public function add()
     {
         require_once 'views/layouts/admin_header.php';
@@ -28,7 +28,7 @@ class AdminCategoryController extends BaseController
         require_once 'views/layouts/admin_footer.php';
     }
 
-    // 2. Xử lý lưu danh mục mới vào DB
+     
     public function store()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -37,13 +37,13 @@ class AdminCategoryController extends BaseController
             if (!empty($name)) {
                 $categoryModel = new CategoryModel();
 
-                // KIỂM TRA TRÙNG TÊN
+                 
                 if ($categoryModel->checkNameExists($name)) {
                     header("Location: index.php?controller=AdminCategory&action=add&msg=duplicate");
                     exit();
                 }
 
-                // Nếu không trùng, tiến hành lưu
+                 
                 if ($categoryModel->addCategory($name)) {
                     header("Location: index.php?controller=AdminCategory&action=index&msg=success");
                     exit();
@@ -55,13 +55,13 @@ class AdminCategoryController extends BaseController
         }
     }
 
-    // 3. Hiển thị form Chỉnh sửa (có dữ liệu cũ)
+     
     public function edit()
     {
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
             $categoryModel = new CategoryModel();
-            $category = $categoryModel->getCategoryById($id); // Lấy dữ liệu cũ
+            $category = $categoryModel->getCategoryById($id);  
 
             if ($category) {
                 require_once 'views/layouts/admin_header.php';
@@ -73,7 +73,7 @@ class AdminCategoryController extends BaseController
         }
     }
 
-    // 4. Xử lý lưu cập nhật vào DB
+     
     public function update()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -83,13 +83,13 @@ class AdminCategoryController extends BaseController
             if (!empty($name)) {
                 $categoryModel = new CategoryModel();
 
-                // KIỂM TRA TRÙNG TÊN
+                 
                 if ($categoryModel->checkNameExists($name, $id)) {
                     header("Location: index.php?controller=AdminCategory&action=edit&id=" . $id . "&msg=duplicate");
                     exit();
                 }
 
-                // Nếu an toàn, tiến hành cập nhật
+                 
                 if ($categoryModel->updateCategory($id, $name)) {
                     header("Location: index.php?controller=AdminCategory&action=index&msg=updated");
                     exit();

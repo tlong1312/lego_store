@@ -217,13 +217,13 @@
                     <div class="col-lg-12">
                         <div class="product__pagination">
                             <?php
-                            // Previous
+                             
                             if ($current_page > 1): ?>
                                 <a
                                     href="index.php?controller=product&action=index&page=<?= $current_page - 1 ?>&keyword=<?= urlencode($keyword) ?>&category_id=<?= $category_id ?>&price_range=<?= htmlspecialchars($price_range) ?>&sort=<?= htmlspecialchars($sort) ?>">&lt;</a>
                             <?php endif;
 
-                            // First page
+                             
                             if ($current_page > 3): ?>
                                 <a
                                     href="index.php?controller=product&action=index&page=1&keyword=<?= urlencode($keyword) ?>&category_id=<?= $category_id ?>&price_range=<?= htmlspecialchars($price_range) ?>&sort=<?= htmlspecialchars($sort) ?>">1</a>
@@ -232,7 +232,7 @@
                                 <?php endif;
                             endif;
 
-                            // Pages
+                             
                             $start = max(1, $current_page - 2);
                             $end = min($total_pages, $current_page + 2);
 
@@ -243,7 +243,7 @@
                                 </a>
                             <?php endfor;
 
-                            // Last page
+                             
                             if ($current_page < $total_pages - 2): ?>
                                 <?php if ($current_page < $total_pages - 3): ?>
                                     <span class="pagination-dots">...</span>
@@ -252,7 +252,7 @@
                                     href="index.php?controller=product&action=index&page=<?= $total_pages ?>&keyword=<?= urlencode($keyword) ?>&category_id=<?= $category_id ?>&price_range=<?= htmlspecialchars($price_range) ?>&sort=<?= htmlspecialchars($sort) ?>"><?= $total_pages ?></a>
                             <?php endif;
 
-                            // Next
+                             
                             if ($current_page < $total_pages): ?>
                                 <a
                                     href="index.php?controller=product&action=index&page=<?= $current_page + 1 ?>&keyword=<?= urlencode($keyword) ?>&category_id=<?= $category_id ?>&price_range=<?= htmlspecialchars($price_range) ?>&sort=<?= htmlspecialchars($sort) ?>">&gt;</a>

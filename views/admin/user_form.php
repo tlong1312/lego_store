@@ -91,7 +91,7 @@
             }
         }
 
-        // 1. Kiểm tra Họ và tên
+         
         const fullnameInput = document.getElementById('fullname');
         const fullnameError = document.getElementById('fullnameError');
         if (fullnameInput) {
@@ -103,7 +103,7 @@
             });
         }
 
-        // 2. Kiểm tra Số điện thoại
+         
         const phoneInput = document.getElementById('phone');
         const phoneError = document.getElementById('phoneError');
         const phoneRegex = /^0[35789][0-9]{8}$/;
@@ -117,7 +117,7 @@
             });
         }
 
-        // 3. Kiểm tra Email
+         
         const emailInput = document.getElementById('email');
         const emailError = document.getElementById('emailError');
         const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -156,7 +156,7 @@
         }
 
 
-        // 4. KIỂM SOÁT NÚT SUBMIT: CHẶN TẢI LẠI TRANG ĐỂ GIỮ NGUYÊN CHỮ TRONG Ô
+         
         const userForm = document.getElementById('userForm');
         if (userForm) {
             userForm.addEventListener('submit', function (e) {

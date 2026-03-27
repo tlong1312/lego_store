@@ -4,7 +4,7 @@ require_once 'BaseModel.php';
 class ReceiptModel extends BaseModel
 {
 
-    // 1. Lấy danh sách tất cả phiếu nhập
+     
     public function getAllReceipts()
     {
         $sql = "SELECT r.*, u.fullname AS creator_name 
@@ -15,7 +15,7 @@ class ReceiptModel extends BaseModel
         return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-    // 2. Tạo một phiếu nhập nháp mới (Cần truyền ID của Admin đang đăng nhập)
+     
     public function createDraftReceipt($user_id)
     {
         $sql = "INSERT INTO receipts (user_id, status, total_amount) VALUES (?, 0, 0)";
@@ -27,7 +27,7 @@ class ReceiptModel extends BaseModel
         return false;
     }
 
-    // 3. Lấy thông tin 1 phiếu nhập
+     
     public function getReceiptById($id)
     {
         $sql = "SELECT r.*, u.fullname AS creator_name 
@@ -40,10 +40,10 @@ class ReceiptModel extends BaseModel
         return $stmt->get_result()->fetch_assoc();
     }
 
-    // 4. Lấy danh sách chi tiết các sản phẩm trong 1 phiếu nhập (ĐÃ SỬA THÀNH LEFT JOIN)
+     
     public function getReceiptDetails($receipt_id)
     {
-        // Dùng LEFT JOIN: Lấy toàn bộ chi tiết, nếu product bị xóa thì name, sku, image sẽ là NULL
+         
         $sql = "SELECT d.*, p.name, p.sku, p.image 
                 FROM receipt_details d 
                 LEFT JOIN products p ON d.product_id = p.id 
@@ -55,7 +55,7 @@ class ReceiptModel extends BaseModel
         return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-    // 5. Thêm 1 sản phẩm vào phiếu nhập
+     
     public function addDetail($receipt_id, $product_id, $quantity, $import_price)
     {
         $sql = "INSERT INTO receipt_details (receipt_id, product_id, quantity, import_price) VALUES (?, ?, ?, ?)";
@@ -63,12 +63,12 @@ class ReceiptModel extends BaseModel
         $stmt->bind_param("iiii", $receipt_id, $product_id, $quantity, $import_price);
         $stmt->execute();
 
-        // Cập nhật lại tổng tiền
+         
         $this->updateTotalAmount($receipt_id);
         return true;
     }
 
-    // 6. Xóa 1 sản phẩm khỏi phiếu nhập
+     
     public function removeDetail($detail_id, $receipt_id)
     {
         $sql = "DELETE FROM receipt_details WHERE id = ?";
@@ -80,7 +80,7 @@ class ReceiptModel extends BaseModel
         return true;
     }
 
-    // Cập nhật tổng tiền phiếu nhập
+     
     private function updateTotalAmount($receipt_id)
     {
         $sql = "UPDATE receipts SET total_amount = IFNULL((SELECT SUM(quantity * import_price) FROM receipt_details WHERE receipt_id = ?), 0) WHERE id = ?";
@@ -89,20 +89,35 @@ class ReceiptModel extends BaseModel
         $stmt->execute();
     }
 
-    // 7. HÀM CHỐT PHIẾU
-    public function completeReceipt($receipt_id)
+    public function completeReceipt($receiptId) 
     {
-        $details = $this->getReceiptDetails($receipt_id);
+        $sqlDetails = "SELECT product_id, quantity FROM receipt_details WHERE receipt_id = ?";
+        $stmtDetails = $this->conn->prepare($sqlDetails);
+        $stmtDetails->bind_param("i", $receiptId);
+        $stmtDetails->execute();
+        $details = $stmtDetails->get_result()->fetch_all(MYSQLI_ASSOC);
 
-        // Cấm chốt nếu phiếu rỗng
-        if (empty($details))
-            return false;
+        foreach ($details as $item) {
+            $productId = $item['product_id'];
+            $qtyImport = (int)$item['quantity'];
 
-        // Đổi trạng thái phiếu thành 1 
-        $sqlStatus = "UPDATE receipts SET status = 1 WHERE id = ?";
-        $stmtStatus = $this->conn->prepare($sqlStatus);
-        $stmtStatus->bind_param("i", $receipt_id);
-        return $stmtStatus->execute();
+            $sqlUpdateProd = "UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?";
+            $stmtUpdateProd = $this->conn->prepare($sqlUpdateProd);
+            $stmtUpdateProd->bind_param("ii", $qtyImport, $productId);
+            $stmtUpdateProd->execute();
+
+            $sqlUpdateBatch = "UPDATE receipt_details SET remain_quantity = ? WHERE receipt_id = ? AND product_id = ?";
+            $stmtUpdateBatch = $this->conn->prepare($sqlUpdateBatch);
+            $stmtUpdateBatch->bind_param("iii", $qtyImport, $receiptId, $productId);
+            $stmtUpdateBatch->execute();
+        }
+
+         
+        $sqlUpdateReceipt = "UPDATE receipts SET status = 1 WHERE id = ?";
+        $stmtReceipt = $this->conn->prepare($sqlUpdateReceipt);
+        $stmtReceipt->bind_param("i", $receiptId);
+        
+        return $stmtReceipt->execute();
     }
 
     public function deleteReceipt($id)
@@ -115,6 +130,32 @@ class ReceiptModel extends BaseModel
             return true;
         }
         return false;
+    }
+
+     
+    public function getTotalReceiptsCount($status = '')
+    {
+        $sql = "SELECT COUNT(id) as total FROM receipts WHERE 1=1";
+        $params = [];
+        $types = "";
+
+         
+        if ($status !== '') {
+            $sql .= " AND status = ?";
+            $types .= "i";
+            $params[] = (int)$status;
+        }
+
+        $stmt = $this->conn->prepare($sql);
+        
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+        
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        
+        return $result ? (int)$result['total'] : 0;
     }
 }
 ?>

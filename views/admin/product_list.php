@@ -121,7 +121,7 @@
 
                                 <td class="text-center">
                                     <?php
-                                    // Tính toán Giá Bán dựa trên Giá Nhập và % Tỉ lệ lợi nhuận
+                                     
                                     $selling_price = $item['import_price'] + ($item['import_price'] * $item['profit_margin'] / 100);
                                     ?>
                                     <strong class="text-primary fs-6"><?= number_format($selling_price, 0, ',', '.') ?>
@@ -134,7 +134,7 @@
 
                                 <td class="text-center align-middle">
                                     <?php
-                                    // 1. Số lượng tồn thực tế
+                                     
                                     $currentStock = $item['stock_quantity'] ?? 0;
 
                                     $lowStockThreshold = $item['low_stock_threshold'] ?? 5;
@@ -142,15 +142,15 @@
                                     $textColor = '';
                                     $stockLabel = '';
 
-                                    // 3. Phân loại động theo cấu hình từng mặt hàng
+                                     
                                     if ($currentStock <= 0) {
-                                        $textColor = 'text-danger';       // Đỏ
+                                        $textColor = 'text-danger';        
                                         $stockLabel = 'Hết hàng';
                                     } elseif ($currentStock <= $lowStockThreshold) {
-                                        $textColor = 'text-warning';      // Vàng cam
+                                        $textColor = 'text-warning';       
                                         $stockLabel = 'Sắp hết';
                                     } else {
-                                        $textColor = 'text-success';      // Xanh lá
+                                        $textColor = 'text-success';       
                                         $stockLabel = 'Còn hàng';
                                     }
                                     ?>
@@ -225,7 +225,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-        // === 1. XỬ LÝ CẬP NHẬT TRẠNG THÁI (AJAX) ===
+         
         const statusSelects = document.querySelectorAll('.update-status-select');
         statusSelects.forEach(select => {
             select.addEventListener('change', function () {
@@ -233,7 +233,7 @@
                 const newStatus = this.value;
                 const selectElement = this;
 
-                // Đổi màu nền Select
+                 
                 if (newStatus == '1') {
                     selectElement.classList.remove('bg-secondary');
                     selectElement.classList.add('bg-success');
@@ -257,12 +257,12 @@
             });
         });
 
-        // === 2. TÌM KIẾM TRỰC TIẾP (LIVE SEARCH) & LỌC TRẠNG THÁI ===
+         
         const searchInput = document.getElementById('searchInput');
         const filterRadios = document.querySelectorAll('.filter-radio');
         const productRows = document.querySelectorAll('.product-row');
 
-        // Hàm xử lý lọc kết hợp cả 2 điều kiện
+         
         function filterTable() {
             const keyword = searchInput ? searchInput.value.toLowerCase().trim() : '';
             const activeStatus = document.querySelector('.filter-radio:checked').value;
@@ -272,13 +272,13 @@
                 const productSku = row.querySelector('td:nth-child(4) code').innerText.toLowerCase();
                 const rowStatus = row.getAttribute('data-status');
 
-                // Kiểm tra 1: Có khớp từ khóa gõ vào không?
+                 
                 const isMatchKeyword = productName.includes(keyword) || productSku.includes(keyword);
 
-                // Kiểm tra 2: Có khớp với chấm tròn trạng thái không?
+                 
                 const isMatchStatus = (activeStatus === 'all') || (rowStatus === activeStatus);
 
-                // Nếu khớp cả 2 thì hiện, không thì ẩn
+                 
                 if (isMatchKeyword && isMatchStatus) {
                     row.style.display = '';
                 } else {
@@ -295,7 +295,7 @@
             radio.addEventListener('change', filterTable);
         });
 
-        // === 3. XÁC NHẬN XÓA BẰNG SWEETALERT2 (Sử dụng Event Delegation) ===
+         
         document.addEventListener('click', function (e) {
             const deleteBtn = e.target.closest('.btn-delete-product');
 
@@ -322,7 +322,7 @@
             }
         });
 
-        // === 4. HIỂN THỊ THÔNG BÁO TỪ CONTROLLER ===
+         
         <?php if (isset($_GET['msg'])): ?>
 
             <?php if ($_GET['msg'] === 'hidden_due_to_stock'): ?>
@@ -331,7 +331,7 @@
                     title: 'Đã ẩn sản phẩm!',
                     text: 'Sản phẩm còn tồn kho nên chỉ có thể ẩn',
                     confirmButtonText: 'Đã hiểu',
-                    confirmButtonColor: '#0dcaf0' // Màu xanh cyan
+                    confirmButtonColor: '#0dcaf0'  
                 });
 
             <?php elseif ($_GET['msg'] === 'delete_success'): ?>
@@ -361,7 +361,7 @@
 
             <?php endif; ?>
 
-            // Xóa tham số msg trên URL
+             
             const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?controller=AdminProduct&action=index";
             window.history.replaceState({ path: newUrl }, '', newUrl);
         <?php endif; ?>

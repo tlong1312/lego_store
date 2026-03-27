@@ -1,4 +1,4 @@
-<div class="container-xxl flex-grow-1 container-p-y">
+<div class="container-xxl grow container-p-y">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
         <div class="d-flex flex-column justify-content-center">
             <h4 class="mb-1 mt-3">Chi tiết đơn hàng #DH<?= str_pad($order['id'], 3, '0', STR_PAD_LEFT) ?></h4>
@@ -41,11 +41,25 @@
                 <div class="card-body mt-3">
                     <div class="d-flex justify-content-start align-items-center mb-4">
                         <div class="avatar me-2">
-                            <span class="avatar-initial rounded bg-label-secondary"><i class="bx bx-map bx-sm"></i></span>
+                            <span class="avatar-initial rounded bg-label-secondary"><i
+                                    class="bx bx-map bx-sm"></i></span>
                         </div>
                         <div class="d-flex flex-column">
                             <h6 class="mb-0">Nhà riêng / Nơi làm việc</h6>
-                            <small class="text-muted"><?= htmlspecialchars($order['shipping_address']) ?></small>
+
+                            <small class="text-muted mt-1 text-wrap" style="line-height: 1.6;">
+                                <i class="bx bx-home-alt me-1"></i> <strong>Đường/Số nhà:</strong>
+                                <?= htmlspecialchars($order['shipping_address']) ?><br>
+
+                                <i class="bx bx-map-pin me-1"></i> <strong>Phường/Xã:</strong>
+                                <?= !empty($order['shipping_ward']) ? htmlspecialchars($order['shipping_ward']) : '<span class="fst-italic text-warning">Chưa có Phường/Xã</span>' ?><br>
+
+                                <?php if (!empty($order['shipping_province'])): ?>
+                                    <i class="bx bx-buildings me-1"></i> <strong>Tỉnh/Thành phố:</strong>
+                                    <strong><?= htmlspecialchars($order['shipping_province']) ?></strong>
+                                <?php endif; ?>
+                            </small>
+
                         </div>
                     </div>
                 </div>
@@ -77,19 +91,21 @@
                                                         style="object-fit: cover; border: 1px solid #eee;">
                                                     <div>
                                                         <h6 class="mb-0 text-wrap" style="max-width: 250px;">
-                                                            <?= htmlspecialchars($item['name']) ?></h6>
+                                                            <?= htmlspecialchars($item['name']) ?>
+                                                        </h6>
                                                         <small class="text-muted">Mã SP: #<?= $item['product_id'] ?></small>
                                                     </div>
                                                 <?php else: ?>
                                                     <div class="avatar me-3" style="width: 50px; height: 50px;">
-                                                        <span class="avatar-initial rounded bg-label-danger"><i class="bx bx-trash"></i></span>
+                                                        <span class="avatar-initial rounded bg-label-danger"><i
+                                                                class="bx bx-trash"></i></span>
                                                     </div>
                                                     <div>
                                                         <h6 class="mb-0 text-danger fst-italic">Sản phẩm đã bị xóa</h6>
                                                         <small class="text-muted">Mã SP cũ: #<?= $item['product_id'] ?></small>
                                                     </div>
                                                 <?php endif; ?>
-                                                </div>
+                                            </div>
                                         </td>
                                         <td class="text-center align-middle">
                                             <span class="badge bg-label-secondary"><?= $item['quantity'] ?></span>
@@ -150,26 +166,27 @@
 
                     <div class="d-flex justify-content-between align-items-center mt-3 pb-3">
                         <span class="fw-bold fs-5 text-dark">Tổng tiền:</span>
-                        <span class="fw-bold fs-5 text-danger"><?= number_format($order['total_money'], 0, ',', '.') ?> đ</span>
+                        <span class="fw-bold fs-5 text-danger"><?= number_format($order['total_money'], 0, ',', '.') ?>
+                            đ</span>
                     </div>
 
                     <div class="d-flex gap-2 mt-2 pt-2 border-top">
                         <?php if ($order['status'] == 0): ?>
                             <a href="index.php?controller=AdminOrder&action=updateStatus&id=<?= $order['id'] ?>&status=1"
-                                class="btn btn-primary flex-grow-1">Giao hàng</a>
+                                class="btn btn-primary grow">Giao hàng</a>
                             <a href="index.php?controller=AdminOrder&action=updateStatus&id=<?= $order['id'] ?>&status=3"
                                 class="btn btn-outline-danger confirm-cancel-btn"
                                 data-message="Bạn có chắc chắn muốn hủy đơn hàng này?">Hủy</a>
 
                         <?php elseif ($order['status'] == 1): ?>
                             <a href="index.php?controller=AdminOrder&action=updateStatus&id=<?= $order['id'] ?>&status=2"
-                                class="btn btn-success flex-grow-1">Hoàn thành</a>
+                                class="btn btn-success grow">Hoàn thành</a>
                             <a href="index.php?controller=AdminOrder&action=updateStatus&id=<?= $order['id'] ?>&status=3"
                                 class="btn btn-outline-danger confirm-cancel-btn"
                                 data-message="Bạn có chắc chắn muốn hủy đơn hàng đang giao này?">Hủy</a>
 
                         <?php elseif ($order['status'] == 2): ?>
-                            <button class="btn btn-secondary flex-grow-1" disabled>Đã hoàn tất</button>
+                            <button class="btn btn-secondary grow" disabled>Đã hoàn tất</button>
                             <a href="index.php?controller=AdminOrder&action=updateStatus&id=<?= $order['id'] ?>&status=3"
                                 class="btn btn-outline-danger confirm-cancel-btn"
                                 data-message="Đơn hàng đã hoàn thành. Bạn có chắc chắn muốn chuyển sang trạng thái Hủy?">Hủy</a>
@@ -188,7 +205,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-    /* Tránh việc popup bị chìm dưới các thành phần khác */
+     
     .swal2-container {
         z-index: 99999 !important;
     }
@@ -196,8 +213,8 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        
-        // --- 1. HIỆN POPUP THÔNG BÁO TỪ CONTROLLER ---
+
+         
         <?php if (isset($_GET['msg'])): ?>
             <?php if ($_GET['msg'] === 'status_updated'): ?>
                 Swal.fire({
@@ -215,8 +232,8 @@
                     confirmButtonColor: '#696cff'
                 });
             <?php endif; ?>
-            
-            // Dọn dẹp URL sau khi hiện popup
+
+             
             const urlParams = new URLSearchParams(window.location.search);
             urlParams.delete('msg');
             const newUrl = window.location.pathname + '?' + urlParams.toString();
@@ -224,13 +241,13 @@
         <?php endif; ?>
 
 
-        // --- 2. XÁC NHẬN KHI BẤM NÚT "HỦY ĐƠN" BẰNG SWEETALERT2 ---
+         
         const confirmButtons = document.querySelectorAll('.confirm-cancel-btn');
-        
+
         confirmButtons.forEach(button => {
             button.addEventListener('click', function (e) {
-                e.preventDefault(); // Chặn hành vi click link chuyển trang mặc định
-                
+                e.preventDefault();  
+
                 const targetUrl = this.getAttribute('href');
                 const confirmMessage = this.getAttribute('data-message');
 
@@ -245,7 +262,7 @@
                     cancelButtonText: 'Trở lại'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Nếu bấm "Vâng, hủy đơn" thì mới thực hiện chuyển trang
+                         
                         window.location.href = targetUrl;
                     }
                 });

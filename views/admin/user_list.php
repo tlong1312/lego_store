@@ -135,7 +135,7 @@
                     return;
                 }
 
-                // Đổi màu nền: admin (Xanh dương) - customer (Xám)
+                 
                 if (newRole === 'admin') {
                     selectElement.classList.remove('bg-secondary');
                     selectElement.classList.add('bg-primary');

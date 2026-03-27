@@ -5,18 +5,18 @@ require_once 'models/CategoryModel.php';
 class AdminProductController extends BaseController
 {
 
-    // Danh sách sản phẩm
+     
     public function index()
     {
         $productModel = new ProductModel();
 
-        // Kiểm tra xem trên URL có biến keyword (từ khóa tìm kiếm) hay không
+         
         if (isset($_GET['keyword']) && !empty(trim($_GET['keyword']))) {
             $keyword = trim($_GET['keyword']);
-            // Nếu có từ khóa -> Gọi hàm tìm kiếm
+             
             $products = $productModel->searchProductsByName($keyword);
         } else {
-            // Nếu không có từ khóa -> Lấy tất cả
+             
             $products = $productModel->getAllProducts();
         }
 
@@ -25,10 +25,10 @@ class AdminProductController extends BaseController
         require_once 'views/layouts/admin_footer.php';
     }
 
-    // Form thêm mới
+     
     public function add()
     {
-        //Lấy danh sách Categories từ DB truyền sang View
+         
         $categoryModel = new CategoryModel();
         $categories = $categoryModel->getAllCategories();
 
@@ -37,7 +37,7 @@ class AdminProductController extends BaseController
         require_once 'views/layouts/admin_footer.php';
     }
 
-    // Action: Cập nhật tồn kho trực tiếp bằng AJAX
+     
     public function updateStock()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -47,28 +47,28 @@ class AdminProductController extends BaseController
             $productModel = new ProductModel();
             $result = $productModel->updateStock($id, $stock_quantity);
 
-            // Trả về kết quả dạng JSON cho JavaScript đọc
+             
             header('Content-Type: application/json');
             if ($result) {
                 echo json_encode(['success' => true]);
             } else {
                 echo json_encode(['success' => false]);
             }
-            exit(); // Ngừng chạy tiếp vì đây là API ngầm
+            exit();  
         }
     }
 
-    // Action: Cập nhật trạng thái trực tiếp bằng AJAX
+     
     public function updateStatus()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $id = $_POST['id'];
-            $status = $_POST['status']; // Nhận giá trị 1 hoặc 0
+            $status = $_POST['status'];  
 
             $productModel = new ProductModel();
             $result = $productModel->updateStatus($id, $status);
 
-            // Trả về JSON
+             
             header('Content-Type: application/json');
             if ($result) {
                 echo json_encode(['success' => true]);
@@ -79,11 +79,11 @@ class AdminProductController extends BaseController
         }
     }
 
-    // Xử lý lưu (THÊM MỚI)
+     
     public function store()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Lấy toàn bộ dữ liệu từ form
+             
             $name = $_POST['name'];
             $sku = $_POST['sku'];
             $theme_id = $_POST['theme_id'];
@@ -101,25 +101,25 @@ class AdminProductController extends BaseController
             $status = $_POST['status'];
             $description = $_POST['description'];
 
-            // HỨNG BIẾN MỚI: Ngưỡng sắp hết hàng (Mặc định 5 nếu để trống)
+             
             $low_stock_threshold = isset($_POST['low_stock_threshold']) && $_POST['low_stock_threshold'] !== '' ? (int)$_POST['low_stock_threshold'] : 5;
 
-            // Xử lý upload ảnh
+             
             $imageName = "";
             if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
                 $target_dir = "public/admin/assets/images/";
 
-                // Đổi tên file để tránh trùng lặp
+                 
                 $imageName = time() . '_' . basename($_FILES["image"]["name"]);
                 $target_file = $target_dir . $imageName;
 
                 move_uploaded_file($_FILES["image"]["tmp_name"], $target_file);
             }
 
-            // Gọi Model để lưu vào DB
+             
             $productModel = new ProductModel();
             
-            // LƯU Ý: Bạn cần đảm bảo hàm addProduct trong ProductModel.php ĐÃ ĐƯỢC CẬP NHẬT để nhận biến $low_stock_threshold này
+             
             $isSuccess = $productModel->addProduct(
                 $theme_id,
                 $sku,
@@ -132,7 +132,7 @@ class AdminProductController extends BaseController
                 $import_price,
                 $profit_margin,
                 $status,
-                $low_stock_threshold // Thêm biến này vào cuối
+                $low_stock_threshold  
             );
 
             if ($isSuccess) {
@@ -144,15 +144,15 @@ class AdminProductController extends BaseController
         }
     }
 
-    // 1. Hiển thị form chỉnh sửa
+     
     public function edit()
     {
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
             $productModel = new ProductModel();
-            $product = $productModel->getProductById($id); // Lấy dữ liệu cũ
+            $product = $productModel->getProductById($id);  
 
-            //Lấy danh sách Categories từ DB để đổ vào thẻ Select trong form Sửa
+             
             $categoryModel = new CategoryModel();
             $categories = $categoryModel->getAllCategories();
 
@@ -166,7 +166,7 @@ class AdminProductController extends BaseController
         }
     }
 
-    // 2. Xử lý lưu cập nhật
+     
     public function update()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -188,23 +188,23 @@ class AdminProductController extends BaseController
             $status = $_POST['status'];
             $description = $_POST['description'];
             
-            // HỨNG BIẾN MỚI: Ngưỡng sắp hết hàng (Mặc định 5 nếu để trống)
+             
             $low_stock_threshold = isset($_POST['low_stock_threshold']) && $_POST['low_stock_threshold'] !== '' ? (int)$_POST['low_stock_threshold'] : 5;
 
-            $imageName = $_POST['old_image']; // Mặc định lấy tên ảnh cũ
+            $imageName = $_POST['old_image'];  
 
             if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-                // Nếu người dùng có chọn file ảnh mới -> up file và đổi tên
+                 
                 $target_dir = "public/admin/assets/images/";
                 $imageName = time() . '_' . basename($_FILES["image"]["name"]);
                 $target_file = $target_dir . $imageName;
                 move_uploaded_file($_FILES["image"]["tmp_name"], $target_file);
             }
 
-            // Gọi Model để Update
+             
             $productModel = new ProductModel();
             
-            // LƯU Ý: Bạn cần đảm bảo hàm updateProduct trong ProductModel.php ĐÃ ĐƯỢC CẬP NHẬT để nhận biến $low_stock_threshold này
+             
             $isSuccess = $productModel->updateProduct(
                 $id,
                 $theme_id,
@@ -218,7 +218,7 @@ class AdminProductController extends BaseController
                 $import_price,
                 $profit_margin,
                 $status,
-                $low_stock_threshold // Thêm biến này vào cuối
+                $low_stock_threshold  
             );
 
             if ($isSuccess) {
@@ -230,7 +230,7 @@ class AdminProductController extends BaseController
         }
     }
 
-    // Xóa sản phẩm
+     
     public function delete()
     {
         if (isset($_GET['id'])) {
@@ -242,7 +242,7 @@ class AdminProductController extends BaseController
             if ($product) {
                 $currentStock = isset($product['stock_quantity']) ? (int) $product['stock_quantity'] : 0;
 
-                // 2. KIỂM TRA TỒN KHO
+                 
                 if ($currentStock > 0) {
                     $productModel->updateStatus($id, 0);
 
@@ -250,11 +250,11 @@ class AdminProductController extends BaseController
                     exit();
 
                 } else {
-                    // NẾU CHƯA NHẬP HÀNG (Tồn kho = 0): Tiến hành xóa vĩnh viễn
+                     
 
-                    // Xóa file ảnh vật lý
+                     
                     if (!empty($product['image'])) {
-                        $imagePath = "public/admin/assets/images/" . $product['image']; // Đã sửa lại đường dẫn cho khớp với thư mục ở hàm upload
+                        $imagePath = "public/admin/assets/images/" . $product['image'];  
                         if (file_exists($imagePath)) {
                             unlink($imagePath);
                         }
@@ -280,7 +280,7 @@ class AdminProductController extends BaseController
         }
     }
 
-    // Hiển thị chi tiết 1 sản phẩm
+     
     public function show()
     {
         if (isset($_GET['id'])) {
@@ -299,6 +299,30 @@ class AdminProductController extends BaseController
                 echo "<script>alert('Sản phẩm không tồn tại!'); window.history.back();</script>";
             }
         }
+    }
+
+     
+    public function checkStock() 
+    {
+        $stockAtDate = null;
+        $searchedDate = '';
+        $product = null;
+
+        if (isset($_GET['id']) && isset($_GET['date'])) {
+            $productId = (int)$_GET['id'];
+            $searchedDate = $_GET['date'];
+
+            require_once 'models/ProductModel.php';
+            $productModel = new ProductModel();
+            
+            $product = $productModel->getProductById($productId);
+            
+            $stockAtDate = $productModel->getHistoricalStock($productId, $searchedDate);
+        }
+
+        require_once 'views/layouts/admin_header.php';
+        require_once 'views/admin/product_stock_history.php';
+        require_once 'views/layouts/admin_footer.php';
     }
 }
 ?>

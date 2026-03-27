@@ -104,20 +104,20 @@
 </form>
 
 <script>
-    // Điền lại thông tin tài khoản
+     
     function useAccountAddress() {
         document.getElementById('fullname').value = '<?= htmlspecialchars($user['fullname']) ?>';
         document.getElementById('phone').value = '<?= htmlspecialchars($user['phone']) ?>';
         document.getElementById('address').value = '<?= htmlspecialchars($user['address']) ?>';
     }
-    // Xóa trắng để nhập mới
+     
     function clearAddress() {
         document.getElementById('fullname').value = '';
         document.getElementById('phone').value = '';
         document.getElementById('address').value = '';
         document.getElementById('fullname').focus();
     }
-    // Ẩn/hiện box ngân hàng
+     
     function showBankInfo() { document.getElementById('bank_info_box').style.display = 'block'; }
     function hideBankInfo() { document.getElementById('bank_info_box').style.display = 'none'; }
 </script>

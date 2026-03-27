@@ -18,7 +18,7 @@ class UserModel extends BaseModel
     {
         $passwordHash = md5($password);
 
-        // Rất chuẩn: Đã chặn đăng nhập nếu is_locked = 1
+         
         $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ? AND password = ? AND is_locked = 0");
         $stmt->bind_param("ss", $email, $passwordHash);
         $stmt->execute();
@@ -37,7 +37,7 @@ class UserModel extends BaseModel
 
 
 
-    // KIỂM TRA TRÙNG EMAIL 
+     
     public function checkEmailExists($email, $ignore_id = null)
     {
         $sql = "SELECT id FROM users WHERE email = ?";
@@ -47,7 +47,7 @@ class UserModel extends BaseModel
             $stmt = $this->conn->prepare($sql);
             $stmt->bind_param("si", $email, $ignore_id);
         } else {
-            // Trường hợp Thêm Mới
+             
             $stmt = $this->conn->prepare($sql);
             $stmt->bind_param("s", $email);
         }
@@ -58,7 +58,7 @@ class UserModel extends BaseModel
         return $result->num_rows > 0;
     }
 
-    // Lấy danh sách tất cả người dùng
+     
     public function getAllUsers($keyword = "", $role = "")
     {
         $sql = "SELECT * FROM users WHERE 1=1";
@@ -93,7 +93,7 @@ class UserModel extends BaseModel
         return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-    // Admin thêm người dùng (Có thể chọn quyền admin hoặc customer)
+     
     public function addUser($fullname, $email, $password, $phone, $address, $role)
     {
         $sql = "INSERT INTO users (fullname, email, password, phone, address, role, is_locked) 
@@ -114,7 +114,7 @@ class UserModel extends BaseModel
         return $stmt->execute();
     }
 
-    // Khóa / Mở khóa tài khoản
+     
     public function updateLockStatus($id, $is_locked)
     {
         $sql = "UPDATE users SET is_locked = ? WHERE id = ?";

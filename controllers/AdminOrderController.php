@@ -3,32 +3,38 @@ require_once 'models/OrderModel.php';
 
 class AdminOrderController extends BaseController
 {
-    // Hàm hiển thị danh sách đơn hàng
     public function index()
     {
+        $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+        $date = isset($_GET['date']) ? trim($_GET['date']) : '';
+        $status = isset($_GET['status']) ? trim($_GET['status']) : '';
+        $sort = isset($_GET['sort']) ? trim($_GET['sort']) : 'newest';
+
+        $ward = isset($_GET['ward']) ? trim($_GET['ward']) : '';
+
         $orderModel = new OrderModel();
-        // Giả sử bạn có hàm getAllOrders trong Model
-        $orders = $orderModel->getAllOrders();
+
+        $wardsList = $orderModel->getDistinctWards();
+
+        $orders = $orderModel->getAllOrders($keyword, $date, $status, $sort, $ward);
 
         require_once 'views/layouts/admin_header.php';
         require_once 'views/admin/order_list.php';
         require_once 'views/layouts/admin_footer.php';
     }
 
-    // Hàm hiển thị chi tiết đơn hàng
     public function detail()
     {
         if (isset($_GET['id'])) {
             $id = (int) $_GET['id'];
             $orderModel = new OrderModel();
 
-            // Lấy thông tin đơn hàng và sản phẩm
             $order = $orderModel->getOrderById($id);
             $orderItems = $orderModel->getOrderItems($id);
 
             if ($order) {
                 require_once 'views/layouts/admin_header.php';
-                require_once 'views/admin/order_detail.php'; // Gọi View ở đây
+                require_once 'views/admin/order_detail.php';
                 require_once 'views/layouts/admin_footer.php';
             } else {
                 echo "Không tìm thấy đơn hàng!";
@@ -36,24 +42,20 @@ class AdminOrderController extends BaseController
         }
     }
 
-    // Cập nhật trạng thái đơn hàng
     public function updateStatus()
     {
         if (isset($_GET['id']) && isset($_GET['status'])) {
             $id = (int) $_GET['id'];
-            $status = (int) $_GET['status']; // 3 là Hủy
+            $status = (int) $_GET['status'];
 
             $orderModel = new OrderModel();
 
-            // Lấy thông tin đơn hàng hiện tại để kiểm tra
             $currentOrder = $orderModel->getOrderById($id);
 
-            // NẾU TRẠNG THÁI MỚI LÀ "HỦY" VÀ ĐƠN NÀY CHƯA HỦY TRƯỚC ĐÓ -> TIẾN HÀNH HOÀN KHO
             if ($status === 3 && $currentOrder['status'] != 3) {
                 $orderModel->restoreOrderStock($id);
             }
 
-            // Gọi Model để cập nhật trạng thái xuống DB
             $isSuccess = $orderModel->updateOrderStatus($id, $status);
 
             if ($isSuccess) {
