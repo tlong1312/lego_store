@@ -1,4 +1,8 @@
-<!-- Breadcrumb Section Begin -->
+<?php 
+    $old_email = $_SESSION['old_email'] ?? '';
+    unset($_SESSION['old_email']); 
+?>
+
 <section class="breadcrumb-option">
     <div class="container">
         <div class="row">
@@ -14,22 +18,17 @@
         </div>
     </div>
 </section>
-<!-- Breadcrumb Section End -->
-
-<!-- Login Section Begin -->
 <section class="checkout spad">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-5 col-md-7 col-sm-10">
 
-                <!-- Card -->
                 <div style="
                     background: #fff;
                     border: 1px solid #e8e8e8;
                     box-shadow: 0 8px 40px rgba(0,0,0,0.08);
                     padding: 50px 45px 40px;
                 ">
-                    <!-- Icon header -->
                     <div class="text-center mb-4">
                         <div style="
                             width: 64px; height: 64px;
@@ -46,27 +45,13 @@
                         <p style="color:#aaa; font-size:13px; margin-top:6px;">Chào mừng bạn trở lại LEGO Store</p>
                     </div>
 
-                    <?php if (!empty($error)): ?>
-                        <div style="
-                            background: #fff3f3;
-                            border-left: 4px solid #e74c3c;
-                            padding: 12px 16px;
-                            margin-bottom: 20px;
-                            font-size: 13px;
-                            color: #c0392b;
-                        ">
-                            <i class="fa fa-exclamation-circle" style="margin-right:6px;"></i>
-                            <?= htmlspecialchars($error) ?>
-                        </div>
-                    <?php endif; ?>
-
                     <form action="index.php?controller=auth&action=processLogin" method="POST">
                         <div class="checkout__input">
                             <p>Email <span>*</span></p>
                             <input type="email" name="email-username"
                                    placeholder="example@email.com"
                                    style="color: #111;"
-                                   value="<?= htmlspecialchars($_POST['email-username'] ?? '') ?>"
+                                   value="<?= htmlspecialchars($old_email) ?>"
                                    required>
                         </div>
 
@@ -101,10 +86,7 @@
                         </a>
                     </p>
                 </div>
-                <!-- End Card -->
-
-            </div>
+                </div>
         </div>
     </div>
 </section>
-<!-- Login Section End -->

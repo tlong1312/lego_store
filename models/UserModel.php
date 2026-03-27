@@ -17,8 +17,6 @@ class UserModel extends BaseModel
     public function login($email, $password)
     {
         $passwordHash = md5($password);
-
-         
         $stmt = $this->conn->prepare("SELECT * FROM users WHERE email = ? AND password = ? AND is_locked = 0");
         $stmt->bind_param("ss", $email, $passwordHash);
         $stmt->execute();
@@ -26,18 +24,22 @@ class UserModel extends BaseModel
         return $result->fetch_assoc();
     }
 
-    public function register($fullname, $email, $password, $phone, $address)
+    public function register($fullname, $email, $password, $phone, $address, $ward, $province)
     {
-        $passwordHash = md5($password);
+        $hashedPassword = md5($password); 
         $role = 'customer';
-        $stmt = $this->conn->prepare("INSERT INTO users (fullname, email, password, phone, address, role) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", $fullname, $email, $passwordHash, $phone, $address, $role);
+
+        $sql = "INSERT INTO users (fullname, email, password, phone, address, ward, province, role) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ssssssss", $fullname, $email, $hashedPassword, $phone, $address, $ward, $province, $role);
+        
         return $stmt->execute();
     }
 
 
 
-     
     public function checkEmailExists($email, $ignore_id = null)
     {
         $sql = "SELECT id FROM users WHERE email = ?";
@@ -47,7 +49,6 @@ class UserModel extends BaseModel
             $stmt = $this->conn->prepare($sql);
             $stmt->bind_param("si", $email, $ignore_id);
         } else {
-             
             $stmt = $this->conn->prepare($sql);
             $stmt->bind_param("s", $email);
         }
@@ -58,7 +59,6 @@ class UserModel extends BaseModel
         return $result->num_rows > 0;
     }
 
-     
     public function getAllUsers($keyword = "", $role = "")
     {
         $sql = "SELECT * FROM users WHERE 1=1";

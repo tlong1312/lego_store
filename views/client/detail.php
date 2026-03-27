@@ -156,47 +156,49 @@
                             </div>
 
                             <div class="col-lg-6" style="padding-left: 30px;">
-    <h5 class="mb-4" style="margin-bottom: 30px;">Thêm đánh giá của bạn</h5>
-    <?php if (isset($_SESSION['user'])): ?>
-        <form action="index.php?controller=product&action=submitReview" method="POST"
-            style="background: #f9f9f9; padding: 40px 30px; border-radius: 8px; border: 1px solid #eee;">
-            <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+                                <h5 class="mb-4" style="margin-bottom: 30px;">Thêm đánh giá của bạn</h5>
+                                <?php if (isset($_SESSION['user'])): ?>
+                                    <form action="index.php?controller=product&action=submitReview" method="POST"
+                                        style="background: #f9f9f9; padding: 40px 30px; border-radius: 8px; border: 1px solid #eee;">
+                                        <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
 
-            <div class="form-group" style="margin-bottom: 25px;">
-                <label style="font-weight: bold; display: block; margin-bottom: 10px; font-size: 15px;">
-                    Chất lượng sản phẩm:
-                </label>
-                <select name="rating" class="form-control"
-                    style="padding: 12px; border: 1px solid #ddd; width: 100%; font-size: 14px; text-align: center; height: auto; display: block;">
-                    <option value="5">⭐⭐⭐⭐⭐ (Tuyệt vời)</option>
-                    <option value="4">⭐⭐⭐⭐ (Tốt)</option>
-                    <option value="3">⭐⭐⭐ (Bình thường)</option>
-                    <option value="2">⭐⭐ (Tệ)</option>
-                    <option value="1">⭐ (Rất tệ)</option>
-                </select>
-            </div>
+                                        <div class="form-group" style="margin-bottom: 25px;">
+                                            <label
+                                                style="font-weight: bold; display: block; margin-bottom: 10px; font-size: 15px;">
+                                                Chất lượng sản phẩm:
+                                            </label>
+                                            <select name="rating" class="form-control"
+                                                style="padding: 12px; border: 1px solid #ddd; width: 100%; font-size: 14px; text-align: center; height: auto; display: block;">
+                                                <option value="5">⭐⭐⭐⭐⭐ (Tuyệt vời)</option>
+                                                <option value="4">⭐⭐⭐⭐ (Tốt)</option>
+                                                <option value="3">⭐⭐⭐ (Bình thường)</option>
+                                                <option value="2">⭐⭐ (Tệ)</option>
+                                                <option value="1">⭐ (Rất tệ)</option>
+                                            </select>
+                                        </div>
 
-            <div class="form-group" style="margin-bottom: 30px;">
-                <label style="font-weight: bold; display: block; margin-bottom: 10px; font-size: 15px;">
-                    Cảm nhận của bạn:
-                </label>
-                <textarea name="comment" class="form-control" rows="5" required
-                    placeholder="Bộ LEGO này lắp ráp có mượt không? Màu sắc thế nào?"
-                    style="padding: 15px; border: 1px solid #ddd; font-family: Arial, sans-serif; width: 100%; resize: vertical; display: block;"></textarea>
-            </div>
+                                        <div class="form-group" style="margin-bottom: 30px;">
+                                            <label
+                                                style="font-weight: bold; display: block; margin-bottom: 10px; font-size: 15px;">
+                                                Cảm nhận của bạn:
+                                            </label>
+                                            <textarea name="comment" class="form-control" rows="5" required
+                                                placeholder="Bộ LEGO này lắp ráp có mượt không? Màu sắc thế nào?"
+                                                style="padding: 15px; border: 1px solid #ddd; font-family: Arial, sans-serif; width: 100%; resize: vertical; display: block;"></textarea>
+                                        </div>
 
-            <button type="submit" class="site-btn w-100 border-0"
-                style="padding: 14px; font-size: 16px; font-weight: bold;">GỬI ĐÁNH GIÁ</button>
-        </form>
-    <?php else: ?>
-        <div class="alert alert-warning"
-            style="background: #fff3cd; color: #856404; border-color: #ffeeba; padding: 15px; border-radius: 5px;">
-            Vui lòng <a href="index.php?controller=auth&action=login"
-                style="font-weight: bold; color: #e53637; text-decoration: underline;">đăng nhập
-                tài khoản</a> để gửi đánh giá!
-        </div>
-    <?php endif; ?>
-</div>
+                                        <button type="submit" class="site-btn w-100 border-0"
+                                            style="padding: 14px; font-size: 16px; font-weight: bold;">GỬI ĐÁNH GIÁ</button>
+                                    </form>
+                                <?php else: ?>
+                                    <div class="alert alert-warning"
+                                        style="background: #fff3cd; color: #856404; border-color: #ffeeba; padding: 15px; border-radius: 5px;">
+                                        Vui lòng <a href="index.php?controller=auth&action=login"
+                                            style="font-weight: bold; color: #e53637; text-decoration: underline;">đăng nhập
+                                            tài khoản</a> để gửi đánh giá!
+                                    </div>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>

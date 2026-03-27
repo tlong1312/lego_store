@@ -31,34 +31,55 @@ class AuthController extends BaseController
             $password = $_POST['password'] ?? '';
             $confirm = $_POST['confirm_password'] ?? '';
             $phone = trim($_POST['phone'] ?? '');
+
+            $province = trim($_POST['province_name'] ?? '');
+            $ward = trim($_POST['ward_name'] ?? '');
             $address = trim($_POST['address'] ?? '');
 
+            $errors = [];
+
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                echo "<script>alert('Email không hợp lệ!'); window.history.back();</script>";
-                return;
+                $errors['email'] = 'Email không đúng định dạng!';
             }
 
             if (!preg_match('/^(0[35789][0-9]{8})$/', $phone)) {
-                echo "<script>alert('Số điện thoại không hợp lệ! Vui lòng nhập 10 số bắt đầu bằng 03x, 05x, 07x, 08x hoặc 09x.'); window.history.back();</script>";
-                return;
+                $errors['phone'] = 'Số điện thoại phải gồm 10 số (Bắt đầu bằng 03, 05, 07, 08, 09).';
             }
 
             if ($password !== $confirm) {
-                echo "<script>alert('Mật khẩu xác nhận không khớp!'); window.history.back();</script>";
-                return;
+                $errors['confirm_password'] = 'Mật khẩu xác nhận không khớp!';
+            }
+            if (empty($province)) {
+                $errors['province'] = 'Vui lòng chọn Tỉnh/Thành!';
+            }
+            if (empty($ward)) {
+                $errors['ward'] = 'Vui lòng chọn Phường/Xã!';
+            }
+            if (empty($address)) {
+                $errors['address_detail'] = 'Vui lòng nhập Số nhà, Tên đường!';
             }
 
             $userModel = new UserModel();
 
-            if ($userModel->emailExists($email)) {
-                echo "<script>alert('Email này đã được sử dụng!'); window.history.back();</script>";
+            if (!isset($errors['email']) && $userModel->emailExists($email)) {
+                $errors['email'] = 'Email này đã được sử dụng!';
+            }
+
+            if (!empty($errors)) {
+                $_SESSION['register_errors'] = $errors;
+                $_SESSION['old_data'] = $_POST;
+                $this->redirect('index.php?controller=auth&action=register');
                 return;
             }
 
-            if ($userModel->register($fullname, $email, $password, $phone, $address)) {
-                echo "<script>alert('Đăng ký thành công! Vui lòng đăng nhập.'); window.location.href='index.php?controller=auth&action=login';</script>";
+            if ($userModel->register($fullname, $email, $password, $phone, $address, $ward, $province)) {
+                $_SESSION['flash_type'] = 'success';
+                $_SESSION['flash_msg'] = 'Đăng ký thành công! Vui lòng đăng nhập.';
+                $this->redirect('index.php?controller=auth&action=login');
             } else {
-                echo "<script>alert('Đăng ký thất bại, vui lòng thử lại!'); window.history.back();</script>";
+                $_SESSION['flash_type'] = 'error';
+                $_SESSION['flash_msg'] = 'Đăng ký thất bại, vui lòng thử lại!';
+                $this->redirect('index.php?controller=auth&action=register');
             }
         }
     }
@@ -66,15 +87,17 @@ class AuthController extends BaseController
     public function processLogin()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $email = $_POST['email-username'] ?? '';
+            $email = trim($_POST['email-username'] ?? '');
             $password = $_POST['password'] ?? '';
 
             $userModel = new UserModel();
             $user = $userModel->login($email, $password);
 
             if ($user) {
-
                 $_SESSION['user'] = $user;
+
+                $_SESSION['flash_type'] = 'success';
+                $_SESSION['flash_msg'] = 'Chào mừng ' . htmlspecialchars($user['fullname']) . ' trở lại!';
 
                 if ($user['role'] == 'admin') {
                     $this->redirect('index.php?controller=dashboard&action=index');
@@ -82,14 +105,22 @@ class AuthController extends BaseController
                     $this->redirect('index.php?controller=home&action=index');
                 }
             } else {
-                echo "<script>alert('Email hoặc mật khẩu không đúng, hoặc tài khoản bị khóa!'); window.history.back();</script>";
+                $_SESSION['flash_type'] = 'error';
+                $_SESSION['flash_msg'] = 'Email hoặc mật khẩu không đúng, hoặc tài khoản bị khóa!';
+                $_SESSION['old_email'] = $email;
+
+                $this->redirect('index.php?controller=auth&action=login');
             }
         }
     }
-
     public function logout()
     {
-        session_destroy();
+        if (isset($_SESSION['user'])) {
+            unset($_SESSION['user']);
+        }
+        $_SESSION['flash_type'] = 'success';
+        $_SESSION['flash_msg'] = 'Đăng xuất thành công! Hẹn gặp lại bạn.';
+
         $this->redirect('index.php?controller=home&action=index');
     }
 }

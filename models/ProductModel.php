@@ -309,7 +309,12 @@ class ProductModel extends BaseModel
     public function checkUserBoughtProduct($user_id, $product_id) {
         $sql = "SELECT od.id FROM order_details od 
                 JOIN orders o ON o.id = od.order_id 
-                WHERE o.user_id = ? AND od.product_id = ? LIMIT 1";
+                WHERE o.user_id = ? 
+                AND od.product_id = ? 
+                AND o.status != 0 
+                AND o.status != 1
+                AND o.status != 3
+                LIMIT 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("ii", $user_id, $product_id);
         $stmt->execute();
