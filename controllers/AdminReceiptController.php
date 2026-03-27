@@ -5,7 +5,7 @@ require_once 'models/ProductModel.php';
 class AdminReceiptController extends BaseController
 {
 
-     
+
     public function index()
     {
         $receiptModel = new ReceiptModel();
@@ -18,12 +18,12 @@ class AdminReceiptController extends BaseController
         require_once 'views/layouts/admin_footer.php';
     }
 
-     
+
     public function create()
     {
         $receiptModel = new ReceiptModel();
 
-         
+
         $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
 
         $newReceiptId = $receiptModel->createDraftReceipt($user_id);
@@ -34,7 +34,7 @@ class AdminReceiptController extends BaseController
         }
     }
 
-     
+
     public function edit()
     {
         if (isset($_GET['id'])) {
@@ -45,7 +45,7 @@ class AdminReceiptController extends BaseController
             $is_completed = ($receipt['status'] == 1);
             $details = $receiptModel->getReceiptDetails($id);
 
-             
+
             $productModel = new ProductModel();
             $products = $productModel->getAllProducts();
 
@@ -55,7 +55,7 @@ class AdminReceiptController extends BaseController
         }
     }
 
-     
+
     public function addDetail()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -73,7 +73,7 @@ class AdminReceiptController extends BaseController
         }
     }
 
-     
+
     public function removeDetail()
     {
         if (isset($_GET['detail_id']) && isset($_GET['receipt_id'])) {
@@ -85,58 +85,47 @@ class AdminReceiptController extends BaseController
         }
     }
 
-     
+
     public function complete()
     {
         if (isset($_GET['id'])) {
-            $id = $_GET['id'];
+            $receiptId = (int) $_GET['id'];
             $receiptModel = new ReceiptModel();
-            $productModel = new ProductModel();  
 
-             
-            if ($receiptModel->completeReceipt($id)) {
+            $details = $receiptModel->getReceiptDetails($receiptId);
 
-                 
-                $details = $receiptModel->getReceiptDetails($id);
-
-                if ($details && count($details) > 0) {
-                    foreach ($details as $item) {
-                        $p_id = $item['product_id'];
-                        $qty_nhap = $item['quantity'];
-                        $gia_nhap = $item['import_price'];
-
-                         
-                        $productModel->updateStockAndPriceAfterImport($p_id, $qty_nhap, $gia_nhap);
-                    }
-                }
-
-                 
-                header("Location: index.php?controller=AdminReceipt&action=index&msg=completed");
+            if (empty($details)) {
+                header("Location: index.php?controller=AdminReceipt&action=edit&id=" . $receiptId . "&msg=empty_items");
                 exit();
-            } else {
-                echo "<script>alert('Lỗi: Phiếu rỗng hoặc không thể chốt!'); window.history.back();</script>";
             }
+
+            if ($receiptModel->completeReceipt($receiptId)) {
+                header("Location: index.php?controller=AdminReceipt&action=index&msg=completed");
+            } else {
+                header("Location: index.php?controller=AdminReceipt&action=edit&id=$receiptId&msg=error");
+            }
+            exit();
         }
     }
 
-     
+
     public function delete()
     {
         if (isset($_GET['id'])) {
             $id = $_GET['id'];
             $receiptModel = new ReceiptModel();
 
-             
+
             $receipt = $receiptModel->getReceiptById($id);
 
             if ($receipt) {
-                 
+
                 if ($receipt['status'] == 1) {
                     echo "<script>alert('LỖI: Không thể xóa phiếu nhập đã HOÀN THÀNH vì số lượng đã được cộng vào kho. Nếu có sai sót, vui lòng lập phiếu xuất kho để bù trừ!'); window.history.back();</script>";
                     exit();
                 }
 
-                 
+
                 $isSuccess = $receiptModel->deleteReceipt($id);
 
                 if ($isSuccess) {
@@ -149,6 +138,17 @@ class AdminReceiptController extends BaseController
                 echo "<script>alert('Phiếu nhập không tồn tại!'); window.history.back();</script>";
             }
         }
+    }
+
+    public function hasItems($receiptId)
+    {
+        $sql = "SELECT COUNT(*) as total FROM receipt_details WHERE receipt_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $receiptId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+
+        return $result['total'] > 0;
     }
 }
 ?>

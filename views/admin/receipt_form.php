@@ -15,6 +15,14 @@
             </a>
         </div>
 
+        <?php if (isset($_GET['msg']) && $_GET['msg'] == 'empty_items'): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bx bx-error-circle me-1 fs-4 align-middle"></i>
+                <strong>Không thể chốt phiếu!</strong> Bạn phải thêm ít nhất 1 sản phẩm vào bảng bên dưới thì mới được phép
+                lưu.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
         <?php if (!$is_completed): ?>
             <div class="card mb-4 border-primary">
                 <div class="card-header bg-label-primary">
@@ -87,13 +95,15 @@
                                                         <strong><?= htmlspecialchars($item['name']) ?></strong><br>
                                                         <small class="text-muted">SKU: <?= htmlspecialchars($item['sku']) ?></small>
                                                     </div>
-                                                
+
                                                 <?php else: ?>
                                                     <div class="avatar me-3" style="width: 40px; height: 40px;">
-                                                        <span class="avatar-initial rounded bg-label-danger"><i class="bx bx-trash"></i></span>
+                                                        <span class="avatar-initial rounded bg-label-danger"><i
+                                                                class="bx bx-trash"></i></span>
                                                     </div>
                                                     <div>
-                                                        <strong class="text-danger fst-italic">Sản phẩm đã bị xóa khỏi hệ thống</strong><br>
+                                                        <strong class="text-danger fst-italic">Sản phẩm đã bị xóa khỏi hệ
+                                                            thống</strong><br>
                                                         <small class="text-muted">Mã SP cũ: #<?= $item['product_id'] ?></small>
                                                     </div>
                                                 <?php endif; ?>
@@ -101,7 +111,8 @@
                                         </td>
                                         <td class="text-center align-middle fw-bold"><?= $item['quantity'] ?></td>
                                         <td class="text-end align-middle">
-                                            <?= number_format($item['import_price'], 0, ',', '.') ?> đ</td>
+                                            <?= number_format($item['import_price'], 0, ',', '.') ?> đ
+                                        </td>
                                         <td class="text-end align-middle fw-bold text-primary">
                                             <?= number_format($item['quantity'] * $item['import_price'], 0, ',', '.') ?> đ
                                         </td>
@@ -138,11 +149,18 @@
 
                 <?php if (!$is_completed): ?>
                     <div class="text-end mt-4">
-                        <a href="index.php?controller=AdminReceipt&action=complete&id=<?= $receipt['id'] ?>"
-                            class="btn btn-success btn-lg shadow-sm"
-                            onclick="return confirm('CẢNH BÁO: Bạn có chắc chắn muốn HOÀN THÀNH phiếu nhập này không? Sau khi hoàn thành, số lượng sẽ được cộng vào kho, giá nhập sẽ được cập nhật và bạn KHÔNG THỂ sửa phiếu này nữa!');">
-                            <i class="bx bx-check-double me-1"></i> HOÀN THÀNH (CHỐT PHIẾU)
-                        </a>
+                        <?php if (empty($details)): ?>
+                            <a href="javascript:void(0)" class="btn btn-secondary btn-lg shadow-sm"
+                                onclick="alert('LỖI: Phiếu nhập đang trống! Bạn phải thêm ít nhất 1 sản phẩm mới có thể chốt phiếu.');">
+                                <i class="bx bx-check-double me-1"></i> HOÀN THÀNH (CHỐT PHIẾU)
+                            </a>
+                        <?php else: ?>
+                            <a href="index.php?controller=AdminReceipt&action=complete&id=<?= $receipt['id'] ?>"
+                                class="btn btn-success btn-lg shadow-sm"
+                                onclick="return confirm('CẢNH BÁO: Bạn có chắc chắn muốn HOÀN THÀNH phiếu nhập này không? Sau khi hoàn thành, số lượng sẽ được cộng vào kho, giá nhập sẽ được cập nhật và bạn KHÔNG THỂ sửa phiếu này nữa!');">
+                                <i class="bx bx-check-double me-1"></i> HOÀN THÀNH (CHỐT PHIẾU)
+                            </a>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
 

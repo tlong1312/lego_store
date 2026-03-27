@@ -4,7 +4,7 @@ require_once 'BaseModel.php';
 class ReceiptModel extends BaseModel
 {
 
-     
+
     public function getAllReceipts()
     {
         $sql = "SELECT r.*, u.fullname AS creator_name 
@@ -15,7 +15,7 @@ class ReceiptModel extends BaseModel
         return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-     
+
     public function createDraftReceipt($user_id)
     {
         $sql = "INSERT INTO receipts (user_id, status, total_amount) VALUES (?, 0, 0)";
@@ -27,7 +27,7 @@ class ReceiptModel extends BaseModel
         return false;
     }
 
-     
+
     public function getReceiptById($id)
     {
         $sql = "SELECT r.*, u.fullname AS creator_name 
@@ -40,10 +40,10 @@ class ReceiptModel extends BaseModel
         return $stmt->get_result()->fetch_assoc();
     }
 
-     
+
     public function getReceiptDetails($receipt_id)
     {
-         
+
         $sql = "SELECT d.*, p.name, p.sku, p.image 
                 FROM receipt_details d 
                 LEFT JOIN products p ON d.product_id = p.id 
@@ -55,7 +55,7 @@ class ReceiptModel extends BaseModel
         return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-     
+
     public function addDetail($receipt_id, $product_id, $quantity, $import_price)
     {
         $sql = "INSERT INTO receipt_details (receipt_id, product_id, quantity, import_price) VALUES (?, ?, ?, ?)";
@@ -63,12 +63,12 @@ class ReceiptModel extends BaseModel
         $stmt->bind_param("iiii", $receipt_id, $product_id, $quantity, $import_price);
         $stmt->execute();
 
-         
+
         $this->updateTotalAmount($receipt_id);
         return true;
     }
 
-     
+
     public function removeDetail($detail_id, $receipt_id)
     {
         $sql = "DELETE FROM receipt_details WHERE id = ?";
@@ -80,7 +80,7 @@ class ReceiptModel extends BaseModel
         return true;
     }
 
-     
+
     private function updateTotalAmount($receipt_id)
     {
         $sql = "UPDATE receipts SET total_amount = IFNULL((SELECT SUM(quantity * import_price) FROM receipt_details WHERE receipt_id = ?), 0) WHERE id = ?";
@@ -89,7 +89,7 @@ class ReceiptModel extends BaseModel
         $stmt->execute();
     }
 
-    public function completeReceipt($receiptId) 
+    public function completeReceipt($receiptId)
     {
         $sqlDetails = "SELECT product_id, quantity FROM receipt_details WHERE receipt_id = ?";
         $stmtDetails = $this->conn->prepare($sqlDetails);
@@ -99,7 +99,7 @@ class ReceiptModel extends BaseModel
 
         foreach ($details as $item) {
             $productId = $item['product_id'];
-            $qtyImport = (int)$item['quantity'];
+            $qtyImport = (int) $item['quantity'];
 
             $sqlUpdateProd = "UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?";
             $stmtUpdateProd = $this->conn->prepare($sqlUpdateProd);
@@ -112,11 +112,11 @@ class ReceiptModel extends BaseModel
             $stmtUpdateBatch->execute();
         }
 
-         
+
         $sqlUpdateReceipt = "UPDATE receipts SET status = 1 WHERE id = ?";
         $stmtReceipt = $this->conn->prepare($sqlUpdateReceipt);
         $stmtReceipt->bind_param("i", $receiptId);
-        
+
         return $stmtReceipt->execute();
     }
 
@@ -132,30 +132,42 @@ class ReceiptModel extends BaseModel
         return false;
     }
 
-     
+
     public function getTotalReceiptsCount($status = '')
     {
         $sql = "SELECT COUNT(id) as total FROM receipts WHERE 1=1";
         $params = [];
         $types = "";
 
-         
+
         if ($status !== '') {
             $sql .= " AND status = ?";
             $types .= "i";
-            $params[] = (int)$status;
+            $params[] = (int) $status;
         }
 
         $stmt = $this->conn->prepare($sql);
-        
+
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);
         }
-        
+
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
-        
-        return $result ? (int)$result['total'] : 0;
+
+        return $result ? (int) $result['total'] : 0;
     }
+
+    public function hasItems($receiptId)
+    {
+        $sql = "SELECT COUNT(*) as total FROM receipt_details WHERE receipt_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $receiptId);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+
+        return $result['total'] > 0;
+    }
+
 }
 ?>
