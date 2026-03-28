@@ -91,7 +91,7 @@ class ReceiptModel extends BaseModel
 
     public function completeReceipt($receiptId)
     {
-        $sqlDetails = "SELECT product_id, quantity FROM receipt_details WHERE receipt_id = ?";
+        $sqlDetails = "SELECT product_id, quantity, import_price FROM receipt_details WHERE receipt_id = ?";
         $stmtDetails = $this->conn->prepare($sqlDetails);
         $stmtDetails->bind_param("i", $receiptId);
         $stmtDetails->execute();
@@ -100,18 +100,33 @@ class ReceiptModel extends BaseModel
         foreach ($details as $item) {
             $productId = $item['product_id'];
             $qtyImport = (int) $item['quantity'];
+            $importPriceNew = (float) $item['import_price']; 
 
-            $sqlUpdateProd = "UPDATE products SET stock_quantity = stock_quantity + ? WHERE id = ?";
-            $stmtUpdateProd = $this->conn->prepare($sqlUpdateProd);
-            $stmtUpdateProd->bind_param("ii", $qtyImport, $productId);
-            $stmtUpdateProd->execute();
+            $sqlGetProd = "SELECT stock_quantity, import_price FROM products WHERE id = ?";
+            $stmtGetProd = $this->conn->prepare($sqlGetProd);
+            $stmtGetProd->bind_param("i", $productId);
+            $stmtGetProd->execute();
+            $resultProd = $stmtGetProd->get_result();
+            
+            if ($resultProd->num_rows > 0) {
+                $prodData = $resultProd->fetch_assoc();
+                $currentStock = (int) $prodData['stock_quantity'];
+                $currentAvgPrice = (float) $prodData['import_price'];
 
-            $sqlUpdateBatch = "UPDATE receipt_details SET remain_quantity = ? WHERE receipt_id = ? AND product_id = ?";
-            $stmtUpdateBatch = $this->conn->prepare($sqlUpdateBatch);
-            $stmtUpdateBatch->bind_param("iii", $qtyImport, $receiptId, $productId);
-            $stmtUpdateBatch->execute();
+                $newTotalStock = $currentStock + $qtyImport;
+                
+                if ($newTotalStock > 0) {
+                    $newAvgPrice = (($currentStock * $currentAvgPrice) + ($qtyImport * $importPriceNew)) / $newTotalStock;
+                } else {
+                    $newAvgPrice = 0;
+                }
+
+                $sqlUpdateProd = "UPDATE products SET stock_quantity = ?, import_price = ? WHERE id = ?";
+                $stmtUpdateProd = $this->conn->prepare($sqlUpdateProd);
+                $stmtUpdateProd->bind_param("idi", $newTotalStock, $newAvgPrice, $productId);
+                $stmtUpdateProd->execute();
+            }
         }
-
 
         $sqlUpdateReceipt = "UPDATE receipts SET status = 1 WHERE id = ?";
         $stmtReceipt = $this->conn->prepare($sqlUpdateReceipt);

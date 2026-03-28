@@ -29,46 +29,43 @@ class AdminUserController extends BaseController
     public function store()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-             
+
             $fullname = trim($_POST['fullname']);
             $email = trim($_POST['email']);
             $phone = trim($_POST['phone']);
             $address = trim($_POST['address']);
             $role = $_POST['role'];
             $password = trim($_POST['password']);
+            
+            $province = isset($_POST['province']) ? trim($_POST['province']) : '';
+            $ward = isset($_POST['ward']) ? trim($_POST['ward']) : '';
 
-             
-            if (empty($fullname) || empty($email)) {
+            if (empty($fullname) || empty($email) || empty($province) || empty($ward) || empty($address)) {
                 header("Location: index.php?controller=AdminUser&action=add&msg=empty_fields");
                 exit();
             }
 
-             
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 header("Location: index.php?controller=AdminUser&action=add&msg=invalid_email");
                 exit();
             }
 
-             
             if (!empty($phone) && !preg_match("/^0[35789][0-9]{8}$/", $phone)) {
                 header("Location: index.php?controller=AdminUser&action=add&msg=invalid_phone");
                 exit();
             }
 
-             
             if (empty($password)) {
                 $password = "123456";
             }
 
-             
             $userModel = new UserModel();
             if ($userModel->checkEmailExists($email)) {
                 header("Location: index.php?controller=AdminUser&action=add&msg=duplicate_email");
                 exit();
             }
 
-             
-            if ($userModel->addUser($fullname, $email, $password, $phone, $address, $role)) {
+            if ($userModel->addUser($fullname, $email, $password, $phone, $address, $province, $ward, $role)) {
                 header("Location: index.php?controller=AdminUser&action=index&msg=success");
                 exit();
             } else {
@@ -109,23 +106,23 @@ class AdminUserController extends BaseController
     }
 
 
-     
+
 
     public function checkEmail()
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 
-             
+
             $id = isset($_POST['id']) ? $_POST['id'] : null;
 
             if (!empty($email)) {
                 $userModel = new UserModel();
                 if ($userModel->checkEmailExists($email, $id)) {
-                     
+
                     echo json_encode(['status' => 'exists']);
                 } else {
-                     
+
                     echo json_encode(['status' => 'available']);
                 }
             }

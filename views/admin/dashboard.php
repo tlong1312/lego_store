@@ -45,23 +45,23 @@
                 </a>
             </div>
             <div class="col-lg-6 col-md-12 col-6 mb-4">
-    <div class="card h-100 shadow-sm border-0 transition-hover">
-        <div class="card-body">
-            <div class="card-title d-flex align-items-start justify-content-between">
-                <div class="avatar shrink-0">
-                    <i class="menu-icon tf-icons bx bx-wallet bx-sm"></i>
+                <div class="card h-100 shadow-sm border-0 transition-hover">
+                    <div class="card-body">
+                        <div class="card-title d-flex align-items-start justify-content-between">
+                            <div class="avatar shrink-0">
+                                <i class="menu-icon tf-icons bx bx-wallet bx-sm"></i>
+                            </div>
+                        </div>
+                        <span class="d-block mb-1">Doanh thu</span>
+
+                        <h3 class="card-title text-nowrap mb-1">
+                            <?= isset($totalRevenue) ? number_format($totalRevenue, 0, ',', '.') : '0' ?> đ
+                        </h3>
+
+                        <small class="text-muted">Đã hoàn thành</small>
+                    </div>
                 </div>
             </div>
-            <span class="d-block mb-1">Doanh thu</span>
-            
-            <h3 class="card-title text-nowrap mb-1">
-                <?= isset($totalRevenue) ? number_format($totalRevenue, 0, ',', '.') : '0' ?> đ
-            </h3>
-            
-            <small class="text-muted">Đã hoàn thành</small>
-        </div>
-    </div>
-</div>
         </div>
     </div>
 </div>
@@ -73,52 +73,20 @@
             <div class="card-header d-flex align-items-center justify-content-between">
                 <h5 class="card-title m-0 me-2">Thống kê báo cáo</h5>
             </div>
-            <div class="card-body">
-                <ul class="p-0 m-0">
-                    <li class="d-flex mb-4 pb-1">
-                        <div class="avatar shrink-0 me-3">
-                            <span class="avatar-initial rounded bg-label-primary"><i class="bx bx-package"></i></span>
-                        </div>
-                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                            <div class="me-2">
-                                <h6 class="mb-0">Đơn hàng #DH001</h6>
-                                <small class="text-muted">Nguyễn Văn A</small>
-                            </div>
-                            <div class="user-progress">
-                                <small class="fw-semibold">13.000.000 đ</small>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="d-flex mb-4 pb-1">
-                        <div class="avatar shrink-0 me-3">
-                            <span class="avatar-initial rounded bg-label-success"><i class="bx bx-package"></i></span>
-                        </div>
-                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                            <div class="me-2">
-                                <h6 class="mb-0">Đơn hàng #DH002</h6>
-                                <small class="text-muted">Trần Thị B</small>
-                            </div>
-                            <div class="user-progress">
-                                <small class="fw-semibold">8.500.000 đ</small>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="d-flex mb-4 pb-1">
-                        <div class="avatar shrink-0 me-3">
-                            <span class="avatar-initial rounded bg-label-info"><i class="bx bx-package"></i></span>
-                        </div>
-                        <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                            <div class="me-2">
-                                <h6 class="mb-0">Đơn hàng #DH003</h6>
-                                <small class="text-muted">Lê Văn C</small>
-                            </div>
-                            <div class="user-progress">
-                                <small class="fw-semibold">25.000.000 đ</small>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+            <div class="card h-100">
+                <div class="card-header d-flex align-items-center justify-content-between pb-0">
+                    <div class="card-title mb-0">
+                        <h5 class="m-0 me-2 text-primary fw-bold">Doanh thu 7 ngày gần nhất</h5>
+                    </div>
+                </div>
+                <div class="card-body mt-3">
+                    <canvas id="revenueChart" style="height: 300px; width: 100%;"></canvas>
+                </div>
             </div>
+
+
         </div>
     </div>
 
@@ -168,3 +136,55 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+
+        const labels = <?= json_encode($chartDates) ?>;
+        const data = <?= json_encode($chartRevenues) ?>;
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu',
+                    data: data,
+                    borderColor: '#696cff', 
+                    backgroundColor: 'rgba(105, 108, 255, 0.1)', 
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4, 
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#696cff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }, 
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.parsed.y.toLocaleString('vi-VN') + ' đ';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return value.toLocaleString('vi-VN') + ' đ';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>

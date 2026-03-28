@@ -266,5 +266,17 @@ class OrderModel extends BaseModel
         $stmt->bind_param("iii", $newRemain, $receiptId, $productId);
         $stmt->execute();
     }
+
+    // Lấy tổng doanh thu theo từng ngày trong 7 ngày gần nhất
+    public function getRevenueLast7Days() {
+        $sql = "SELECT DATE(created_at) as order_date, SUM(total_money) as daily_revenue 
+                FROM orders 
+                WHERE status = 2 AND created_at >= DATE(NOW() - INTERVAL 6 DAY) 
+                GROUP BY DATE(created_at) 
+                ORDER BY order_date ASC";
+                
+        $result = $this->conn->query($sql);
+        return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
 }
 ?>

@@ -55,9 +55,41 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Tỉnh / Thành phố <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select" id="province_select">
+                                <option value="">Chọn Tỉnh/Thành</option>
+                            </select>
+                            <input type="hidden" id="province_name" name="province">
+                            <div id="provinceError" class="text-danger mt-1 fw-bold"
+                                style="display: none; font-size: 13px;">
+                                <i class="bx bx-error-circle"></i> Vui lòng chọn Tỉnh / Thành phố.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Phường / Xã <span class="text-danger">*</span></label>
+                            <select class="form-select" id="ward_select" disabled>
+                                <option value="">Chọn Phường/Xã</option>
+                            </select>
+                            <input type="hidden" id="ward_name" name="ward">
+                            <div id="wardError" class="text-danger mt-1 fw-bold"
+                                style="display: none; font-size: 13px;">
+                                <i class="bx bx-error-circle"></i> Vui lòng chọn Phường / Xã.
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Địa chỉ</label>
-                        <input type="text" class="form-control" name="address" />
+                        <label class="form-label fw-bold">Địa chỉ chi tiết (Số nhà, tên đường) <span
+                                class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="address" name="address"
+                            placeholder="VD: 123 Đường Lê Lợi..." />
+                        <div id="addressError" class="text-danger mt-1 fw-bold" style="display: none; font-size: 13px;">
+                            <i class="bx bx-error-circle"></i> Vui lòng nhập địa chỉ chi tiết.
+                        </div>
                     </div>
 
                     <div class="mb-4">
@@ -81,6 +113,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
+        // Hàm hiển thị lỗi chung
         function showError(inputElement, errorElement, isError) {
             if (isError) {
                 errorElement.style.display = 'block';
@@ -91,19 +124,70 @@
             }
         }
 
-         
+
+        const provinceSelect = document.getElementById('province_select');
+        const wardSelect = document.getElementById('ward_select');
+        const provinceNameInput = document.getElementById('province_name');
+        const wardNameInput = document.getElementById('ward_name');
+
+        fetch("https://provinces.open-api.vn/api/v2/p/")
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(item => {
+                    let option = document.createElement('option');
+                    option.value = item.code;
+                    option.text = item.name;
+                    provinceSelect.add(option);
+                });
+            });
+
+        provinceSelect.addEventListener('change', function () {
+            let provinceCode = this.value;
+            let provinceName = this.options[this.selectedIndex].text;
+
+            provinceNameInput.value = provinceCode ? provinceName : '';
+            showError(provinceSelect, document.getElementById('provinceError'), !provinceCode);
+
+            wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
+            wardNameInput.value = '';
+            wardSelect.disabled = true;
+
+            if (provinceCode) {
+                fetch(`https://provinces.open-api.vn/api/v2/p/${provinceCode}?depth=2`)
+                    .then(response => response.json())
+                    .then(data => {
+                        wardSelect.disabled = false; // Mở khóa ô Phường/Xã
+                        data.wards.forEach(item => {
+                            let option = document.createElement('option');
+                            option.value = item.code;
+                            option.text = item.name;
+                            wardSelect.add(option);
+                        });
+                    });
+            }
+        });
+
+        wardSelect.addEventListener('change', function () {
+            let wardName = this.options[this.selectedIndex].text;
+            wardNameInput.value = this.value ? wardName : '';
+            showError(wardSelect, document.getElementById('wardError'), !this.value);
+        });
+
+
         const fullnameInput = document.getElementById('fullname');
         const fullnameError = document.getElementById('fullnameError');
         if (fullnameInput) {
-            fullnameInput.addEventListener('blur', function () {
-                showError(this, fullnameError, this.value.trim() === '');
-            });
-            fullnameInput.addEventListener('input', function () {
-                showError(this, fullnameError, false);
-            });
+            fullnameInput.addEventListener('blur', function () { showError(this, fullnameError, this.value.trim() === ''); });
+            fullnameInput.addEventListener('input', function () { showError(this, fullnameError, false); });
         }
 
-         
+        const addressInput = document.getElementById('address');
+        const addressError = document.getElementById('addressError');
+        if (addressInput) {
+            addressInput.addEventListener('blur', function () { showError(this, addressError, this.value.trim() === ''); });
+            addressInput.addEventListener('input', function () { showError(this, addressError, false); });
+        }
+
         const phoneInput = document.getElementById('phone');
         const phoneError = document.getElementById('phoneError');
         const phoneRegex = /^0[35789][0-9]{8}$/;
@@ -112,12 +196,9 @@
                 const val = this.value.trim();
                 showError(this, phoneError, val !== '' && !phoneRegex.test(val));
             });
-            phoneInput.addEventListener('input', function () {
-                showError(this, phoneError, false);
-            });
+            phoneInput.addEventListener('input', function () { showError(this, phoneError, false); });
         }
 
-         
         const emailInput = document.getElementById('email');
         const emailError = document.getElementById('emailError');
         const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -156,20 +237,23 @@
         }
 
 
-         
         const userForm = document.getElementById('userForm');
         if (userForm) {
             userForm.addEventListener('submit', function (e) {
                 e.preventDefault();
+
                 if (fullnameInput) fullnameInput.dispatchEvent(new Event('blur'));
                 if (phoneInput) phoneInput.dispatchEvent(new Event('blur'));
+                if (addressInput) addressInput.dispatchEvent(new Event('blur'));
+
+                showError(provinceSelect, document.getElementById('provinceError'), !provinceSelect.value);
+                showError(wardSelect, document.getElementById('wardError'), !wardSelect.value);
 
                 const emailVal = emailInput.value.trim();
                 const isEmailFormatError = emailVal === '' || !emailRegex.test(emailVal);
 
                 if (isEmailFormatError) {
                     emailInput.dispatchEvent(new Event('blur'));
-                    return;
                 }
 
                 const invalidInputs = document.querySelectorAll('.is-invalid');

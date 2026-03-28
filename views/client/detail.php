@@ -24,8 +24,16 @@
             <div class="row align-items-stretch">
                 <div class="col-lg-6">
                     <div class="commerce-detail__media">
-                        <img src="public/client/img/product/<?= htmlspecialchars($product['image']) ?>"
-                            alt="<?= htmlspecialchars($product['name']) ?>">
+                        <?php
+                            $imgName = htmlspecialchars($product['image']);
+                            $adminImgPath = "public/admin/assets/images/" . $imgName;
+                            $clientImgPath = "public/client/img/product/" . $imgName;
+                            
+                            $displayImg = file_exists($adminImgPath) ? $adminImgPath : $clientImgPath;
+                        ?>
+                        <img src="<?= $displayImg ?>" 
+                             alt="<?= htmlspecialchars($product['name']) ?>"
+                             class="img-fluid w-100" style="object-fit: cover; border-radius: 8px;">
                     </div>
                 </div>
 

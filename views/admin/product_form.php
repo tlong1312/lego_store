@@ -78,7 +78,7 @@
                                         class="form-control" placeholder="Mặc định: 5" min="0"
                                         value="<?= isset($product['low_stock_threshold']) ? $product['low_stock_threshold'] : '5' ?>">
                                 </div>
-                                 <div class="form-text">Hệ thống cảng báo khi số lượng tồn kho bằng hoặc thấp
+                                <div class="form-text">Hệ thống cảng báo khi số lượng tồn kho bằng hoặc thấp
                                     hơn mức này.</div>
                             </div>
 
@@ -90,11 +90,13 @@
                                 </select>
                             </div>
 
+
+
                             <div class="mb-3">
-                                <label class="form-label" for="image">Hình ảnh</label>
-                                <input class="form-control" type="file" id="image" name="image" accept="image/*"
-                                    required />
+                                <label class="form-label fw-bold">Hình ảnh sản phẩm</label>
+                                <input class="form-control" type="file" name="image" accept="image/*" required>
                             </div>
+
                         </div>
                     </div>
                     <div class="mb-3">

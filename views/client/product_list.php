@@ -184,17 +184,22 @@
                     </div>
                 </div>
 
-                <!-- Danh sách sản phẩm -->
                 <div class="row">
                     <?php foreach ($products as $product): ?>
                         <?php
                         $gia_ban = $product['import_price'] * (1 + $product['profit_margin'] / 100);
                         $is_out_of_stock = ($product['stock_quantity'] <= 0);
+
+                        $imgName = htmlspecialchars($product['image']);
+                        $adminImgPath = "public/admin/assets/images/" . $imgName;
+                        $clientImgPath = "public/client/img/product/" . $imgName;
+
+                        $displayImg = file_exists($adminImgPath) ? $adminImgPath : $clientImgPath;
                         ?>
                         <div class="col-lg-4 col-md-6 col-sm-6">
                             <div class="product__item <?= $is_out_of_stock ? 'sold-out-item' : '' ?>">
-                                <div class="product__item__pic set-bg"
-                                    data-setbg="public/client/img/product/<?= htmlspecialchars($product['image']) ?>">
+
+                                <div class="product__item__pic set-bg" data-setbg="<?= $displayImg ?>">
 
                                     <?php if ($is_out_of_stock): ?>
                                         <span class="label" style="background: #111; color: #fff;">Hết hàng</span>
@@ -222,18 +227,15 @@
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Phân trang -->
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="product__pagination">
                             <?php
-                             
                             if ($current_page > 1): ?>
                                 <a
                                     href="index.php?controller=product&action=index&page=<?= $current_page - 1 ?>&keyword=<?= urlencode($keyword) ?>&category_id=<?= $category_id ?>&price_range=<?= htmlspecialchars($price_range) ?>&sort=<?= htmlspecialchars($sort) ?>">&lt;</a>
                             <?php endif;
 
-                             
                             if ($current_page > 3): ?>
                                 <a
                                     href="index.php?controller=product&action=index&page=1&keyword=<?= urlencode($keyword) ?>&category_id=<?= $category_id ?>&price_range=<?= htmlspecialchars($price_range) ?>&sort=<?= htmlspecialchars($sort) ?>">1</a>
@@ -242,7 +244,6 @@
                                 <?php endif;
                             endif;
 
-                             
                             $start = max(1, $current_page - 2);
                             $end = min($total_pages, $current_page + 2);
 
@@ -253,7 +254,6 @@
                                 </a>
                             <?php endfor;
 
-                             
                             if ($current_page < $total_pages - 2): ?>
                                 <?php if ($current_page < $total_pages - 3): ?>
                                     <span class="pagination-dots">...</span>
@@ -262,7 +262,6 @@
                                     href="index.php?controller=product&action=index&page=<?= $total_pages ?>&keyword=<?= urlencode($keyword) ?>&category_id=<?= $category_id ?>&price_range=<?= htmlspecialchars($price_range) ?>&sort=<?= htmlspecialchars($sort) ?>"><?= $total_pages ?></a>
                             <?php endif;
 
-                             
                             if ($current_page < $total_pages): ?>
                                 <a
                                     href="index.php?controller=product&action=index&page=<?= $current_page + 1 ?>&keyword=<?= urlencode($keyword) ?>&category_id=<?= $category_id ?>&price_range=<?= htmlspecialchars($price_range) ?>&sort=<?= htmlspecialchars($sort) ?>">&gt;</a>
