@@ -445,5 +445,45 @@ class ProductModel extends BaseModel
         
         return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
+
+    public function getImportDetailsList($productId, $startDate, $endDate) 
+    {
+        $startOfDay = $startDate . ' 00:00:00';
+        $endOfDay = $endDate . ' 23:59:59';
+
+        $sql = "SELECT r.id as receipt_id, r.created_at, rd.quantity, rd.import_price
+                FROM receipt_details rd
+                JOIN receipts r ON rd.receipt_id = r.id
+                WHERE rd.product_id = ? AND r.status = 1
+                AND r.created_at >= ? AND r.created_at <= ?
+                ORDER BY r.created_at DESC";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("iss", $productId, $startOfDay, $endOfDay);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
+
+    public function getExportDetailsList($productId, $startDate, $endDate) 
+    {
+        $startOfDay = $startDate . ' 00:00:00';
+        $endOfDay = $endDate . ' 23:59:59';
+
+        $sql = "SELECT o.id as order_id, o.created_at, od.quantity, od.price, o.status
+                FROM order_details od
+                JOIN orders o ON od.order_id = o.id
+                WHERE od.product_id = ? AND o.status != 3
+                AND o.created_at >= ? AND o.created_at <= ?
+                ORDER BY o.created_at DESC";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("iss", $productId, $startOfDay, $endOfDay);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
+    }
 }
 ?>
