@@ -76,6 +76,8 @@
                         </ul>
                     </li>
 
+
+
                     <li class="menu-item">
                         <a href="index.php?controller=adminOrder&action=index" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-cart-alt"></i>
@@ -84,10 +86,23 @@
                     </li>
 
                     <li class="menu-item">
-                        <a href="index.php?controller=AdminReport&action=inventory" class="menu-link">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
                             <i class="menu-icon tf-icons bx bx-bar-chart-alt-2"></i>
-                            <div data-i18n="Báo cáo Tồn kho">Báo cáo Tồn kho</div>
+                            <div data-i18n="Thống kê">Thống kê</div>
                         </a>
+
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                <a href="index.php?controller=AdminReport&action=inventory" class="menu-link">
+                                    <div data-i18n="Thống kê tồn kho">Thống kê tồn kho</div>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="index.php?controller=AdminReport&action=importExport" class="menu-link">
+                                    <div data-i18n="Thống kê nhập xuất">Thống kê nhập xuất</div>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
 
                     <li class="menu-item">
