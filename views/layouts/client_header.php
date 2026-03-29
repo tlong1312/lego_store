@@ -8,10 +8,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>LEGO Store | Thế Giới Lắp Ráp</title>
+    <link rel="icon" type="image/png" href="public/client/img/icon/icon-lego.png">
+    <link rel="shortcut icon" type="image/png" href="public/client/img/icon/icon-lego.png">
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
         rel="stylesheet">
+
+    <?php
+    $styleVersion = @filemtime(__DIR__ . '/../../public/client/css/style.css') ?: time();
+    $headerKeyword = isset($_GET['keyword']) ? trim((string) $_GET['keyword']) : '';
+    $headerCartCount = 0;
+    if (!empty($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+        foreach ($_SESSION['cart'] as $cartItem) {
+            $headerCartCount += (int) ($cartItem['quantity'] ?? 1);
+        }
+    }
+    $headerCartBadge = $headerCartCount > 99 ? '99+' : (string) $headerCartCount;
+    ?>
 
     <!-- Css Styles -->
     <link rel="stylesheet" href="public/client/css/bootstrap.min.css" type="text/css">
@@ -21,7 +35,7 @@
     <link rel="stylesheet" href="public/client/css/nice-select.css" type="text/css">
     <link rel="stylesheet" href="public/client/css/owl.carousel.min.css" type="text/css">
     <link rel="stylesheet" href="public/client/css/slicknav.min.css" type="text/css">
-    <link rel="stylesheet" href="public/client/css/style.css" type="text/css">
+    <link rel="stylesheet" href="public/client/css/style.css?v=<?= $styleVersion ?>" type="text/css">
 </head>
 
 <body>
@@ -36,6 +50,8 @@
         <div class="offcanvas__option">
             <div class="offcanvas__links">
                 <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
+                    <a href="index.php?controller=auth&action=profile">Tài khoản của tôi</a>
+                    <a href="index.php?controller=auth&action=profile">Chỉnh sửa thông tin</a>
                     <a href="index.php?controller=auth&action=logout">Đăng xuất</a>
                 <?php else: ?>
                     <a href="index.php?controller=auth&action=login">Đăng nhập</a>
@@ -44,10 +60,20 @@
 
         </div>
         <div class="offcanvas__nav__option">
-            <a href="#" class="search-switch"><img src="public/client/img/icon/search.png" alt=""></a>
+            <form class="offcanvas__search-form" action="index.php" method="GET">
+                <input type="hidden" name="controller" value="product">
+                <input type="hidden" name="action" value="index">
+                <input type="text" name="keyword" value="<?= htmlspecialchars($headerKeyword) ?>" placeholder="Tìm sản phẩm..." class="offcanvas__search-input">
+                <button type="submit" class="offcanvas__search-btn" aria-label="Tìm kiếm">
+                    <span class="icon_search"></span>
+                </button>
+            </form>
             <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
-                <a href="index.php?controller=cart&action=index"><img src="public/client/img/icon/cart.png" alt="">
-                    <span>0</span></a>
+                <a href="index.php?controller=cart&action=index" class="offcanvas__cart-link"><img src="public/client/img/icon/cart.png" alt="Giỏ hàng">
+                    <?php if ($headerCartCount > 0): ?>
+                        <span class="cart-badge"><?= $headerCartBadge ?></span>
+                    <?php endif; ?>
+                </a>
             <?php endif; ?>
         </div>
         <div id="mobile-menu-wrap"></div>
@@ -71,7 +97,7 @@
                         <div class="header__top__right">
                             <div class="header__top__links">
                                 <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
-                                    <a href="#">Chào, <?= htmlspecialchars($_SESSION['user']['fullname']) ?></a>
+                                    <a href="index.php?controller=auth&action=profile">Chào, <?= htmlspecialchars($_SESSION['user']['fullname']) ?></a>
                                     <a href="index.php?controller=auth&action=logout">Đăng xuất</a>
                                 <?php else: ?>
                                     <a href="index.php?controller=auth&action=login">Đăng nhập</a>
@@ -112,6 +138,12 @@
                                     <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
                                         <li style="padding: 8px 15px;" onmouseover="this.style.backgroundColor='#f0f0f0'"
                                             onmouseout="this.style.backgroundColor='transparent'">
+                                            <a href="index.php?controller=auth&action=profile"
+                                                style="color: #000; display: block; padding: 5px 0; white-space: nowrap;">Chỉnh
+                                                Sửa Thông Tin</a>
+                                        </li>
+                                        <li style="padding: 8px 15px;" onmouseover="this.style.backgroundColor='#f0f0f0'"
+                                            onmouseout="this.style.backgroundColor='transparent'">
                                             <a href="index.php?controller=cart&action=index"
                                                 style="color: #000; display: block; padding: 5px 0;">Giỏ Hàng</a>
                                         </li>
@@ -143,10 +175,21 @@
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="header__nav__option">
-                        <a href="#" class="search-switch"><img src="public/client/img/icon/search.png" alt=""></a>
+                        <form class="header__search-form" action="index.php" method="GET">
+                            <input type="hidden" name="controller" value="product">
+                            <input type="hidden" name="action" value="index">
+                            <input type="text" name="keyword" value="<?= htmlspecialchars($headerKeyword) ?>" placeholder="Tìm bộ LEGO..." class="header__search-input">
+                            <button type="submit" class="header__search-btn" aria-label="Tìm kiếm">
+                                <span class="icon_search"></span>
+                            </button>
+                        </form>
                         <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
-                            <a href="index.php?controller=cart&action=index"><img src="public/client/img/icon/cart.png"
-                                    alt=""> <span>0</span></a>
+                            <a href="index.php?controller=cart&action=index" class="header__cart-link"><img src="public/client/img/icon/cart.png"
+                                    alt="Giỏ hàng">
+                                <?php if ($headerCartCount > 0): ?>
+                                    <span class="cart-badge"><?= $headerCartBadge ?></span>
+                                <?php endif; ?>
+                            </a>
                         <?php endif; ?>
                     </div>
                 </div>
