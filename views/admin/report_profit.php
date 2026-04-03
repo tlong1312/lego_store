@@ -35,9 +35,7 @@
                         <th>Ngày Nhập</th>
                         <th class="text-start">Sản Phẩm</th>
                         <th>SL Nhập</th>
-                        
-                        <th class="text-warning">Còn Tồn</th>
-                        
+                                                
                         <th class="text-end text-danger">Giá Vốn</th>
                         <th class="text-end text-primary">Giá Bán</th>
                         <th class="text-end text-success">Lợi Nhuận / SP</th>
@@ -63,18 +61,6 @@
                                 <td><?= date('d/m/Y', strtotime($b['import_date'])) ?></td>
                                 <td class="text-start text-wrap" style="max-width: 250px;"><strong><?= htmlspecialchars($b['product_name']) ?></strong></td>
                                 <td><span class="badge bg-secondary"><?= $b['quantity'] ?></span></td>
-                                
-                                <td>
-                                    <?php if (isset($b['remain_quantity'])): ?>
-                                        <?php if ($b['remain_quantity'] == 0): ?>
-                                            <span class="badge bg-label-success">Đã bán hết</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-warning text-dark fw-bold"><?= $b['remain_quantity'] ?></span>
-                                        <?php endif; ?>
-                                    <?php else: ?>
-                                        <span class="text-muted small">N/A</span>
-                                    <?php endif; ?>
-                                </td>
                                 
                                 <td class="text-end text-danger fw-bold"><?= number_format($costPrice, 0, ',', '.') ?> đ</td>
                                 <td class="text-end text-primary fw-bold"><?= number_format($sellingPrice, 0, ',', '.') ?> đ</td>

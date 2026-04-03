@@ -115,13 +115,30 @@ class AuthController extends BaseController
     }
     public function logout()
     {
-        if (isset($_SESSION['user'])) {
-            unset($_SESSION['user']);
-        }
+        $isAdmin = false;
+
+        if ((isset($_GET['type']) && $_GET['type'] === 'admin') || 
+            (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin')) {
+            $isAdmin = true;
+        } 
+
+        if (isset($_SESSION['user'])) unset($_SESSION['user']);
+        if (isset($_SESSION['admin'])) unset($_SESSION['admin']);
+        if (isset($_COOKIE['admin_token'])) setcookie('admin_token', '', time() - 3600, '/');
+        if (isset($_COOKIE['user_token'])) setcookie('user_token', '', time() - 3600, '/');
+
         $_SESSION['flash_type'] = 'success';
         $_SESSION['flash_msg'] = 'Đăng xuất thành công! Hẹn gặp lại bạn.';
 
-        $this->redirect('index.php?controller=home&action=index');
+        $url = $isAdmin ? 'index.php?controller=auth&action=adminlogin' : 'index.php?controller=home&action=index';
+
+        echo "<script>
+            localStorage.removeItem('admin_logged_in');
+            
+            // Chuyển hướng (Dùng replace để không lưu trang Logout vào lịch sử nút Back)
+            window.location.replace('{$url}');
+        </script>";
+        exit();
     }
 }
 

@@ -34,5 +34,28 @@
     <script src="public/admin/assets/vendor/libs/apex-charts/apexcharts.js"></script>
     <script src="public/admin/assets/js/main.js"></script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    <script>
+        window.addEventListener('pageshow', function (event) {
+            // LỚP BẢO VỆ 1: CHỐNG BACK SAU KHI ĐĂNG XUẤT (Bảo mật)
+            if (localStorage.getItem('admin_logged_in') !== 'true') {
+                window.location.replace('index.php?controller=auth&action=adminlogin');
+                return; // Dừng lại ngay, không chạy tiếp các lệnh bên dưới
+            }
+
+            // LỚP BẢO VỆ 2: TỰ ĐỘNG LẤY DATA MỚI KHI BẤM BACK (Trải nghiệm)
+            var isNavigatingBack = event.persisted || 
+                (performance.getEntriesByType("navigation").length > 0 && 
+                 performance.getEntriesByType("navigation")[0].type === "back_forward");
+
+            if (isNavigatingBack) {
+                window.location.reload(); // F5 lấy dữ liệu mới
+            }
+        });
+
+        // Nếu load trang hợp lệ, luôn duy trì thẻ căn cước
+        localStorage.setItem('admin_logged_in', 'true');
+    </script>
+</body>
+</html>
 </body>
 </html>

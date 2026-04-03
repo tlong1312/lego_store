@@ -86,9 +86,15 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <?php if (!empty($item['name'])): ?>
-                                                    <img src="uploads/<?= htmlspecialchars($item['image']) ?>" alt="Ảnh SP"
-                                                        class="rounded me-3" width="50" height="50"
-                                                        style="object-fit: cover; border: 1px solid #eee;">
+                                                    <?php if (!empty($item['image'])): ?>
+                                                        <img src="public/admin/assets/images/<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>"
+                                                            class="rounded me-3" width="50" height="50"
+                                                            style="object-fit: cover; border: 1px solid #eee;">
+                                                    <?php else: ?>
+                                                     <div class="avatar me-3" style="width: 50px; height: 50px;">
+                                                        <span class="avatar-initial rounded bg-label-secondary"><i class="bx bx-image"></i></span>
+                                                    </div>
+                                                <?php endif; ?>
                                                     <div>
                                                         <h6 class="mb-0 text-wrap" style="max-width: 250px;">
                                                             <?= htmlspecialchars($item['name']) ?>

@@ -24,7 +24,7 @@
 
             <div class="col-md-4">
                 <label class="form-label fw-bold">Trong ngày</label>
-                <input type="date" class="form-control" name="target_date" required max="<?= date('Y-m-d') ?>"
+                <input type="date" class="form-control" name="target_date" required 
                     value="<?= isset($_GET['target_date']) ? $_GET['target_date'] : date('Y-m-d') ?>">
             </div>
 
@@ -39,9 +39,15 @@
             <?php if (isset($stockResult) && $stockResult !== null): ?>
                 
                 <?php 
-                    // Định dạng màu sắc dựa trên số lượng tồn kho
                     $colorClass = $stockResult > 0 ? 'success' : 'warning'; 
                     $iconClass = $stockResult > 0 ? 'bx-check-circle' : 'bx-info-circle';
+                    
+                    $today = date('Y-m-d');
+                    if ($selectedDate > $today) {
+                        $dateDisplay = "23h59p ngày " . date('d/m/Y');
+                    } else {
+                        $dateDisplay = "23h59p ngày " . date('d/m/Y', strtotime($selectedDate));
+                    }
                 ?>
                 
                 <div class="row mt-4">
@@ -56,7 +62,7 @@
                                 <div>
                                     <h5 class="mb-1 text-<?= $colorClass ?> fw-bold">Mốc Tồn Kho:</h5>
                                     <p class="mb-0 text-muted fs-6">
-                                        Số lượng trong kho tính đến 23:59 ngày <strong><?= date('d/m/Y', strtotime($selectedDate)) ?></strong> của sản phẩm <strong><?= htmlspecialchars($selectedProductName) ?></strong> là:
+                                        Số lượng trong kho tính đến <strong><?= $dateDisplay ?></strong> của sản phẩm <strong><?= htmlspecialchars($selectedProductName) ?></strong> là:
                                     </p>
                                     <h2 class="mb-0 text-<?= $colorClass ?> mt-2 fw-bold">
                                         <?= $stockResult ?> <small class="fs-6 fw-normal">sản phẩm</small>

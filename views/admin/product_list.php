@@ -17,42 +17,7 @@
             </div>
         </div>
 
-        <ul class="navbar-nav flex-row align-items-center ms-auto">
-            <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <div class="avatar avatar-online">
-                        <img src="public/admin/assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
-                    </div>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            <div class="d-flex">
-                                <div class="shrink-0 me-3">
-                                    <div class="avatar avatar-online">
-                                        <img src="public/admin/assets/img/avatars/1.png" alt
-                                            class="w-px-40 h-auto rounded-circle" />
-                                    </div>
-                                </div>
-                                <div class="row-1">
-                                    <span class="fw-semibold d-block">Admin</span>
-                                    <small class="text-muted">Quản trị viên</small>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="login.php">
-                            <i class="bx bx-power-off me-2"></i>
-                            <span class="align-middle">Đăng xuất</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+
     </div>
 </nav>
 
@@ -121,7 +86,7 @@
 
                                 <td class="text-center">
                                     <?php
-                                     
+
                                     $selling_price = $item['import_price'] + ($item['import_price'] * $item['profit_margin'] / 100);
                                     ?>
                                     <strong class="text-primary fs-6"><?= number_format($selling_price, 0, ',', '.') ?>
@@ -134,7 +99,7 @@
 
                                 <td class="text-center align-middle">
                                     <?php
-                                     
+
                                     $currentStock = $item['stock_quantity'] ?? 0;
 
                                     $lowStockThreshold = $item['low_stock_threshold'] ?? 5;
@@ -142,15 +107,15 @@
                                     $textColor = '';
                                     $stockLabel = '';
 
-                                     
+
                                     if ($currentStock <= 0) {
-                                        $textColor = 'text-danger';        
+                                        $textColor = 'text-danger';
                                         $stockLabel = 'Hết hàng';
                                     } elseif ($currentStock <= $lowStockThreshold) {
-                                        $textColor = 'text-warning';       
+                                        $textColor = 'text-warning';
                                         $stockLabel = 'Sắp hết';
                                     } else {
-                                        $textColor = 'text-success';       
+                                        $textColor = 'text-success';
                                         $stockLabel = 'Còn hàng';
                                     }
                                     ?>
@@ -225,7 +190,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-         
+
         const statusSelects = document.querySelectorAll('.update-status-select');
         statusSelects.forEach(select => {
             select.addEventListener('change', function () {
@@ -233,7 +198,7 @@
                 const newStatus = this.value;
                 const selectElement = this;
 
-                 
+
                 if (newStatus == '1') {
                     selectElement.classList.remove('bg-secondary');
                     selectElement.classList.add('bg-success');
@@ -257,12 +222,12 @@
             });
         });
 
-         
+
         const searchInput = document.getElementById('searchInput');
         const filterRadios = document.querySelectorAll('.filter-radio');
         const productRows = document.querySelectorAll('.product-row');
 
-         
+
         function filterTable() {
             const keyword = searchInput ? searchInput.value.toLowerCase().trim() : '';
             const activeStatus = document.querySelector('.filter-radio:checked').value;
@@ -272,13 +237,13 @@
                 const productSku = row.querySelector('td:nth-child(4) code').innerText.toLowerCase();
                 const rowStatus = row.getAttribute('data-status');
 
-                 
+
                 const isMatchKeyword = productName.includes(keyword) || productSku.includes(keyword);
 
-                 
+
                 const isMatchStatus = (activeStatus === 'all') || (rowStatus === activeStatus);
 
-                 
+
                 if (isMatchKeyword && isMatchStatus) {
                     row.style.display = '';
                 } else {
@@ -295,7 +260,7 @@
             radio.addEventListener('change', filterTable);
         });
 
-         
+
         document.addEventListener('click', function (e) {
             const deleteBtn = e.target.closest('.btn-delete-product');
 
@@ -322,7 +287,7 @@
             }
         });
 
-         
+
         <?php if (isset($_GET['msg'])): ?>
 
             <?php if ($_GET['msg'] === 'hidden_due_to_stock'): ?>
@@ -331,7 +296,7 @@
                     title: 'Đã ẩn sản phẩm!',
                     text: 'Sản phẩm còn tồn kho nên chỉ có thể ẩn',
                     confirmButtonText: 'Đã hiểu',
-                    confirmButtonColor: '#0dcaf0'  
+                    confirmButtonColor: '#0dcaf0'
                 });
 
             <?php elseif ($_GET['msg'] === 'delete_success'): ?>
@@ -361,7 +326,7 @@
 
             <?php endif; ?>
 
-             
+
             const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?controller=AdminProduct&action=index";
             window.history.replaceState({ path: newUrl }, '', newUrl);
         <?php endif; ?>

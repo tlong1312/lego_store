@@ -118,9 +118,15 @@
                             <div data-i18n="Users">Người Dùng</div>
                         </a>
                     </li>
+                    <li class="menu-item mt-3"> <a href="index.php?controller=auth&action=logout&type=admin" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-log-out-circle text-danger"></i>
+                            <div data-i18n="Logout" class="text-danger fw-bold">Đăng xuất</div>
+                        </a>
+                    </li>
                 </ul>
             </aside>
             <div class="layout-page">
 
                 <div class="content-wrapper">
                     <div class="container-xxl grow container-p-y">
+                        
