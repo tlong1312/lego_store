@@ -23,13 +23,17 @@
             ?>
             <div class="col-lg-4 col-md-6 col-sm-6 product-card">
                 <div class="product__item <?= $is_out_of_stock ? 'sold-out-item' : '' ?>">
-                    <a href="index.php?controller=product&action=detail&id=<?= $product['id'] ?>" class="product__item__pic set-bg product__item__image-link" data-setbg="<?= $displayImg ?>">
+                    <a href="index.php?controller=product&action=detail&id=<?= (int) $product['id'] ?>" class="product__item__pic set-bg product__item__image-link" data-setbg="<?= $displayImg ?>">
                         <?php if ($is_out_of_stock): ?>
                             <span class="label" style="background: #e53935; color: #fff;">Hết hàng</span>
                         <?php endif; ?>
                     </a>
                     <div class="product__item__text">
-                        <h6><?= htmlspecialchars($product['name']) ?></h6>
+                        <h6>
+                            <a class="product__item__title-link" href="index.php?controller=product&action=detail&id=<?= (int) $product['id'] ?>">
+                                <?= htmlspecialchars($product['name']) ?>
+                            </a>
+                        </h6>
 
                         <div class="product__item__meta">
                             <h5><?= number_format($gia_ban, 0, ',', '.') ?>đ</h5>

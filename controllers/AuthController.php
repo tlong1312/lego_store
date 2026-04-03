@@ -126,15 +126,21 @@ class AuthController extends BaseController
     {
         $isAdmin = false;
 
-        if ((isset($_GET['type']) && $_GET['type'] === 'admin') || 
-            (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin')) {
+        if (
+            (isset($_GET['type']) && $_GET['type'] === 'admin') ||
+            (isset($_SESSION['user']) && isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin')
+        ) {
             $isAdmin = true;
-        } 
+        }
 
-        if (isset($_SESSION['user'])) unset($_SESSION['user']);
-        if (isset($_SESSION['admin'])) unset($_SESSION['admin']);
-        if (isset($_COOKIE['admin_token'])) setcookie('admin_token', '', time() - 3600, '/');
-        if (isset($_COOKIE['user_token'])) setcookie('user_token', '', time() - 3600, '/');
+        if (isset($_SESSION['user']))
+            unset($_SESSION['user']);
+        if (isset($_SESSION['admin']))
+            unset($_SESSION['admin']);
+        if (isset($_COOKIE['admin_token']))
+            setcookie('admin_token', '', time() - 3600, '/');
+        if (isset($_COOKIE['user_token']))
+            setcookie('user_token', '', time() - 3600, '/');
 
         $_SESSION['flash_type'] = 'success';
         $_SESSION['flash_msg'] = 'Đăng xuất thành công! Hẹn gặp lại bạn.';

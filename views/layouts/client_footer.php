@@ -81,47 +81,36 @@
 $(document).ready(function() {
     // Chỉ thực thi mã này trên trang product list
     if ($('#product-list-container').length) {
-        let currentPage = $('#product-list-data').data('current-page');
-        let activeFilterMode = 'horizontal';
-
-        function formatPriceInputValue(value) {
-            const digits = String(value || '').replace(/\D/g, '');
-            if (!digits) {
-                return '';
-            }
-            return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        }
+        let currentPage = Number($('#product-list-data').data('current-page')) || 1;
 
         function buildUrl(params) {
             const query = new URLSearchParams(params).toString();
             return `index.php?controller=product&action=index&${query}`;
         }
 
-        function collectHorizontalParams(page = 1) {
+        function collectFilterParams(page = 1) {
             return {
                 page: page,
                 keyword: $('#searchForm input[name="keyword"]').val() || '',
-                category_id: $('#searchForm select[name="category_id"]').val() || 0,
-                price_from: $('#searchForm input[name="price_from"]').val() || '',
-                price_to: $('#searchForm input[name="price_to"]').val() || '',
-                price_range: '',
-                sort: $('#sort-select').val() || ''
-            };
-        }
-
-        function collectSidebarParams(page = 1) {
-            return {
-                page: page,
-                keyword: '',
                 category_id: $('#filterForm input[name="category_id"]:checked').val() || 0,
+                price_range: $('#filterForm input[name="price_range"]:checked').val() || '',
                 price_from: '',
                 price_to: '',
-                price_range: $('#filterForm input[name="price_range"]:checked').val() || '',
                 sort: $('#sort-select').val() || ''
             };
         }
 
-        function fetchProducts(params) {
+        function scrollToShopTop() {
+            const $shopSection = $('.shop');
+            if ($shopSection.length) {
+                const top = Math.max(0, $shopSection.offset().top - 20);
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function fetchProducts(params, shouldScrollTop = false) {
             currentPage = params.page || 1;
 
             // Hiển thị hiệu ứng loading
@@ -150,6 +139,10 @@ $(document).ready(function() {
                         var bg = $(this).data('setbg');
                         $(this).css('background-image', 'url(' + bg + ')');
                     });
+
+                    if (shouldScrollTop) {
+                        scrollToShopTop();
+                    }
                 },
                 error: function() {
                     alert('Đã có lỗi xảy ra. Vui lòng thử lại.');
@@ -158,60 +151,37 @@ $(document).ready(function() {
             });
         }
 
-        function applyHorizontalFilter(page = 1) {
-            activeFilterMode = 'horizontal';
-            fetchProducts(collectHorizontalParams(page));
+        function applyFilters(page = 1, shouldScrollTop = false) {
+            fetchProducts(collectFilterParams(page), shouldScrollTop);
         }
 
-        function applySidebarFilter(page = 1) {
-            activeFilterMode = 'sidebar';
-            fetchProducts(collectSidebarParams(page));
-        }
-
-        // Format nhanh cho ô giá khi nhập
-        $('#searchForm input[name="price_from"], #searchForm input[name="price_to"]').on('input', function() {
-            this.value = formatPriceInputValue(this.value);
-        });
-
-        // Nút gợi ý +000.000 để tăng nhanh giá trị
-        $('.price-shortcut-btn').on('click', function() {
-            const targetId = $(this).data('target');
-            const $target = $('#' + targetId);
-            if (!$target.length) {
-                return;
-            }
-            const currentDigits = ($target.val() || '').replace(/\D/g, '');
-            const nextDigits = (currentDigits || '1') + '000000';
-            $target.val(formatPriceInputValue(nextDigits));
-            $target.trigger('focus');
-        });
-
-        // Bắt sự kiện thay đổi bộ lọc
+        // Sidebar là nơi lọc chính cho chủ đề + khoảng giá
         $('#filterForm input[type="radio"]').on('change', function() {
-            applySidebarFilter(1); // Lọc riêng cho sidebar
+            applyFilters(1);
         });
 
-        // Sort theo chế độ lọc hiện tại (ngang hoặc dọc)
+        // Sort ở thanh ngang
         $('#sort-select').on('change', function() {
-            if (activeFilterMode === 'sidebar') {
-                applySidebarFilter(1);
-            } else {
-                applyHorizontalFilter(1);
-            }
+            applyFilters(1);
         });
 
-        // Bắt sự kiện submit form tìm kiếm
+        // Tìm kiếm theo từ khóa ở thanh ngang
         $('#searchForm').on('submit', function(e) {
             e.preventDefault();
-            applyHorizontalFilter(1); // Chỉ bấm nút Lọc mới chạy
+            applyFilters(1);
         });
 
-        // Nút reset trên bộ lọc ngang
+        // Reset đồng thời từ khóa/sắp xếp và bộ lọc sidebar
         $('#filter-reset-btn').on('click', function() {
             $('#searchForm').trigger('reset');
-            $('#searchForm select[name="category_id"]').val('0');
+            $('#searchForm input[name="keyword"]').val('');
             $('#sort-select').val('');
-            applyHorizontalFilter(1);
+            if ($.fn.niceSelect) {
+                $('#sort-select').niceSelect('update');
+            }
+            $('#filterForm input[name="category_id"][value="0"]').prop('checked', true);
+            $('#filterForm input[name="price_range"][value=""]').prop('checked', true);
+            applyFilters(1);
         });
 
         // Bắt sự kiện click vào phân trang
@@ -219,11 +189,7 @@ $(document).ready(function() {
             e.preventDefault();
             const page = $(this).data('page');
             if (page) {
-                if (activeFilterMode === 'sidebar') {
-                    applySidebarFilter(page);
-                } else {
-                    applyHorizontalFilter(page);
-                }
+                applyFilters(page, true);
             }
         });
     }
