@@ -516,12 +516,11 @@
                                 const current = parseInt(input.value || min, 10);
                                 input.value = current - 1;
                                 input.dispatchEvent(new Event('change'));
-                                input.focus();
                             ">-</button>
 
                             <input type="number" name="quantity" value="1" min="1"
                                 max="<?= (int) $product['stock_quantity'] ?>" class="commerce-detail__qty-input"
-                                onfocus="this.select()" onchange="
+                                onchange="
                                         const max = parseInt(this.max, 10) || 1;
                                         const min = parseInt(this.min, 10) || 1;
                                         let val = parseInt(this.value || min, 10);
@@ -543,7 +542,6 @@
                                 const current = parseInt(input.value || min, 10);
                                 input.value = current + 1;
                                 input.dispatchEvent(new Event('change'));
-                                input.focus();
                             ">+</button>
                         </div>
 

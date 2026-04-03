@@ -26,34 +26,18 @@
                         <label for="filter-keyword">Tìm theo tên</label>
                         <input id="filter-keyword" type="text" name="keyword" placeholder="Tìm kiếm sản phẩm..." value="<?= htmlspecialchars($keyword) ?>">
                     </div>
-                    <div class="shop-horizontal-filter__field shop-horizontal-filter__field--theme">
-                        <label for="filter-theme">Lọc theo chủ đề</label>
-                        <select id="filter-theme" name="category_id">
-                            <option value="0" <?= $category_id == 0 ? 'selected' : '' ?>>Tất cả chủ đề</option>
-                            <?php foreach ($themes as $theme): ?>
-                                <option value="<?= $theme['id'] ?>" <?= $category_id == $theme['id'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($theme['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
+                    <div class="shop-horizontal-filter__field shop-horizontal-filter__field--sort">
+                        <label for="sort-select">Sắp xếp</label>
+                        <select name="sort" id="sort-select">
+                            <option value="">Mới nhất</option>
+                            <option value="asc" <?= $sort == 'asc' ? 'selected' : '' ?>>Giá: Thấp đến Cao</option>
+                            <option value="desc" <?= $sort == 'desc' ? 'selected' : '' ?>>Giá: Cao đến Thấp</option>
                         </select>
-                    </div>
-                    <div class="shop-horizontal-filter__field shop-horizontal-filter__field--price">
-                        <label for="filter-price-from">Khoảng giá</label>
-                        <div class="shop-horizontal-filter__price-grid">
-                            <div class="price-quick-input">
-                                <input id="filter-price-from" type="text" name="price_from" placeholder="Từ" value="<?= htmlspecialchars($price_from) ?>">
-                                <button type="button" class="price-shortcut-btn" data-target="filter-price-from">+000.000</button>
-                            </div>
-                            <div class="price-quick-input">
-                                <input id="filter-price-to" type="text" name="price_to" placeholder="Đến" value="<?= htmlspecialchars($price_to) ?>">
-                                <button type="button" class="price-shortcut-btn" data-target="filter-price-to">+000.000</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
                 <div class="shop-horizontal-filter__actions">
-                    <button type="submit" class="shop-btn shop-btn--primary">Lọc</button>
+                    <button type="submit" class="shop-btn shop-btn--primary">Tìm</button>
                     <button type="button" id="filter-reset-btn" class="shop-btn shop-btn--outline">Reset</button>
                 </div>
             </form>
@@ -127,19 +111,9 @@
             <div class="col-lg-9">
                 <div class="shop__product__option">
                     <div class="row">
-                        <div class="col-lg-7 col-md-7">
+                        <div class="col-lg-12 col-md-12">
                             <div class="shop__product__option__left">
                                 <p id="product-count-info">Hiển thị <?= count($products) ?> của <?= $total_products ?> sản phẩm</p>
-                            </div>
-                        </div>
-                        <div class="col-lg-5 col-md-5">
-                            <div class="shop__product__option__right">
-                                <p>Sắp xếp:</p>
-                                <select name="sort" id="sort-select">
-                                    <option value="">Mới nhất</option>
-                                    <option value="asc" <?= $sort == 'asc' ? 'selected' : '' ?>>Giá: Thấp đến Cao</option>
-                                    <option value="desc" <?= $sort == 'desc' ? 'selected' : '' ?>>Giá: Cao đến Thấp</option>
-                                </select>
                             </div>
                         </div>
                     </div>
@@ -185,8 +159,8 @@
 
     .shop-horizontal-filter__fields {
         display: grid;
-        grid-template-columns: minmax(0, 1.05fr) minmax(280px, 1.25fr) minmax(420px, 1.7fr);
-        gap: 6px;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 10px;
         align-items: end;
     }
 
@@ -194,12 +168,8 @@
         min-width: 0;
     }
 
-    .shop-horizontal-filter__field--theme {
-        min-width: 280px;
-    }
-
-    .shop-horizontal-filter__field--price {
-        min-width: 420px;
+    .shop-horizontal-filter__field--sort {
+        min-width: 0;
     }
 
     .shop-horizontal-filter__field label {
@@ -225,55 +195,24 @@
         background: #fff;
     }
 
-    .shop-horizontal-filter__field--theme .nice-select {
+    .shop-horizontal-filter__field--sort .nice-select {
         width: 100%;
         height: 44px;
         line-height: 42px;
         border: 1px solid #d8dde5;
         border-radius: 10px;
         padding-left: 12px;
+        float: none;
     }
 
-    .shop-horizontal-filter__field--theme .nice-select .current {
-        font-size: 14px;
-        color: #1f2937;
+    .shop-horizontal-filter__field--sort .nice-select .current {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .shop-horizontal-filter__field--theme .nice-select:after {
+    .shop-horizontal-filter__field--sort .nice-select:after {
         right: 14px;
-    }
-
-    .shop-horizontal-filter__price-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(185px, 1fr));
-        gap: 6px;
-    }
-
-    .price-quick-input {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 6px;
-        align-items: center;
-    }
-
-    .price-shortcut-btn {
-        height: 34px;
-        border: 1px solid #f8b6ad;
-        border-radius: 999px;
-        background: #fff3f1;
-        color: var(--lego-red);
-        font-size: 11px;
-        font-weight: 800;
-        padding: 0 8px;
-        min-width: 74px;
-        line-height: 1;
-        white-space: nowrap;
-    }
-
-    .price-shortcut-btn:hover {
-        background: var(--lego-red);
-        border-color: var(--lego-red);
-        color: #fff;
     }
 
     .shop-horizontal-filter__actions {
@@ -443,6 +382,30 @@
         color: var(--lego-black);
     }
 
+    .shop .product__item__text h6 .product__item__title-link {
+        color: var(--lego-black);
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        display: inline;
+        font-weight: 700;
+        transition: color 0.2s ease;
+    }
+
+    .shop .product__item__text h6 .product__item__title-link:hover {
+        color: var(--lego-red);
+    }
+
+    .shop .product__item:hover .product__item__text h6 {
+        opacity: 1;
+    }
+
+    .shop .product__item:hover .product__item__text h6 .product__item__title-link {
+        top: auto;
+        opacity: 1;
+        visibility: visible;
+    }
+
     .product__item__image-link {
         display: block;
         cursor: pointer;
@@ -567,6 +530,90 @@
 
         .shop__sidebar {
             margin-bottom: 24px;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .shop-horizontal-filter {
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .shop-horizontal-filter__form,
+        .shop-horizontal-filter__fields {
+            gap: 8px;
+        }
+
+        .shop-horizontal-filter__field label {
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .shop-horizontal-filter__field input,
+        .shop-horizontal-filter__field select,
+        .shop-horizontal-filter__field--sort .nice-select {
+            height: 40px;
+            font-size: 13px;
+        }
+
+        .shop-horizontal-filter__field--sort .nice-select {
+            line-height: 38px;
+        }
+
+        .shop-btn {
+            height: 40px;
+            min-width: 90px;
+            font-size: 14px;
+        }
+
+        .shop__sidebar {
+            padding: 12px 10px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .shop__sidebar__accordion .card {
+            margin-bottom: 10px;
+        }
+
+        .shop__sidebar__accordion .card-body {
+            padding: 10px 6px 4px;
+        }
+
+        .shop__sidebar__accordion .card-heading a {
+            font-size: 14px;
+        }
+
+        .filter-option {
+            gap: 8px;
+            padding: 5px 2px;
+        }
+
+        .filter-option__dot {
+            width: 16px;
+            height: 16px;
+            border-width: 1.5px;
+        }
+
+        .filter-option input[type="radio"]:checked + .filter-option__dot::after {
+            width: 6px;
+            height: 6px;
+        }
+    }
+
+    @media (max-width: 575px) {
+        .shop-btn {
+            height: 38px;
+            font-size: 13px;
+        }
+
+        .shop-horizontal-filter__actions {
+            gap: 6px;
+        }
+
+        .shop__product__option {
+            margin-bottom: 14px;
+            padding-bottom: 8px;
         }
     }
 </style>

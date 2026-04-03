@@ -18,6 +18,15 @@
     <?php
     $styleVersion = @filemtime(__DIR__ . '/../../public/client/css/style.css') ?: time();
     $headerKeyword = isset($_GET['keyword']) ? trim((string) $_GET['keyword']) : '';
+    $headerThemes = [];
+
+    try {
+        $headerProductModel = new ProductModel();
+        $headerThemes = $headerProductModel->getAllThemes();
+    } catch (Throwable $e) {
+        $headerThemes = [];
+    }
+
     $headerCartCount = 0;
     if (!empty($_SESSION['cart']) && is_array($_SESSION['cart'])) {
         foreach ($_SESSION['cart'] as $cartItem) {
@@ -130,6 +139,21 @@
                             </li>
                             <li class="<?= ($current_controller == 'product') ? 'active' : '' ?>">
                                 <a href="index.php?controller=product&action=index">Sản Phẩm</a>
+                                <ul class="dropdown"
+                                    style="min-width: 220px; max-height: 320px; overflow-y: auto; background: #fff; padding: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+                                    <li style="padding: 8px 15px;" onmouseover="this.style.backgroundColor='#f0f0f0'"
+                                        onmouseout="this.style.backgroundColor='transparent'">
+                                        <a href="index.php?controller=product&action=index"
+                                            style="color: #000; display: block; padding: 5px 0; white-space: nowrap;">Tất cả thương hiệu</a>
+                                    </li>
+                                    <?php foreach ($headerThemes as $headerTheme): ?>
+                                        <li style="padding: 8px 15px;" onmouseover="this.style.backgroundColor='#f0f0f0'"
+                                            onmouseout="this.style.backgroundColor='transparent'">
+                                            <a href="index.php?controller=product&action=index&category_id=<?= (int) $headerTheme['id'] ?>"
+                                                style="color: #000; display: block; padding: 5px 0; white-space: nowrap;"><?= htmlspecialchars($headerTheme['name']) ?></a>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
                             </li>
                             <li class="<?= (in_array($current_controller, $utility_controllers)) ? 'active' : '' ?>">
                                 <a href="#">Tiện Ích</a>
