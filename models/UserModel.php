@@ -4,6 +4,33 @@ require_once 'BaseModel.php';
 class UserModel extends BaseModel
 {
 
+    private $userColumnsCache = null;
+
+    private function getUserColumns()
+    {
+        if ($this->userColumnsCache !== null) {
+            return $this->userColumnsCache;
+        }
+
+        $columns = [];
+        $result = $this->conn->query("SHOW COLUMNS FROM users");
+
+        if ($result) {
+            while ($row = $result->fetch_assoc()) {
+                $columns[] = $row['Field'];
+            }
+        }
+
+        $this->userColumnsCache = $columns;
+        return $columns;
+    }
+
+    public function supportsUserRegionFields()
+    {
+        $columns = $this->getUserColumns();
+        return in_array('province', $columns) && in_array('ward', $columns);
+    }
+
 
     public function emailExists($email)
     {
@@ -22,6 +49,67 @@ class UserModel extends BaseModel
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->fetch_assoc();
+    }
+
+    public function getUserById($id)
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM users WHERE id = ? LIMIT 1");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_assoc();
+    }
+
+    public function updateCustomerProfile($id, $fullname, $phone, $address, $province = '', $ward = '')
+    {
+        $columns = $this->getUserColumns();
+
+        $setParts = [
+            'fullname = ?',
+            'phone = ?',
+            'address = ?'
+        ];
+
+        $types = 'sss';
+        $params = [$fullname, $phone, $address];
+
+        if (in_array('province', $columns)) {
+            $setParts[] = 'province = ?';
+            $types .= 's';
+            $params[] = $province;
+        }
+
+        if (in_array('ward', $columns)) {
+            $setParts[] = 'ward = ?';
+            $types .= 's';
+            $params[] = $ward;
+        }
+
+        $sql = 'UPDATE users SET ' . implode(', ', $setParts) . ' WHERE id = ?';
+        $types .= 'i';
+        $params[] = $id;
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+        return $stmt->execute();
+    }
+
+    public function verifyCurrentPassword($id, $password)
+    {
+        $hash = md5($password);
+        $stmt = $this->conn->prepare("SELECT id FROM users WHERE id = ? AND password = ? LIMIT 1");
+        $stmt->bind_param("is", $id, $hash);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->num_rows > 0;
+    }
+
+    public function updateUserPassword($id, $newPassword)
+    {
+        $hash = md5($newPassword);
+        $stmt = $this->conn->prepare("UPDATE users SET password = ? WHERE id = ?");
+        $stmt->bind_param("si", $hash, $id);
+        return $stmt->execute();
     }
 
     public function register($fullname, $email, $password, $phone, $address, $ward, $province)

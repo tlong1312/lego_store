@@ -20,6 +20,23 @@
     background-color: #e9ecef;
     cursor: not-allowed;
 }
+
+    /* Make new address form text clearly readable (black) */
+    #new_address_section input,
+    #new_address_section select,
+    #new_address_section textarea {
+        color: #111111 !important;
+    }
+
+    #new_address_section input::placeholder,
+    #new_address_section textarea::placeholder {
+        color: #6b7280 !important;
+    }
+
+    #new_address_section .nice-select,
+    #new_address_section .nice-select .current {
+        color: #111111 !important;
+    }
 </style>
 
 <!-- Breadcrumb Section Begin -->

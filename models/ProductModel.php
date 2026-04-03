@@ -219,7 +219,7 @@ class ProductModel extends BaseModel
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
-    public function getTotalFilteredProducts($keyword = '', $category_id = 0, $min_price = 0, $max_price = 0) {
+    public function getTotalFilteredProducts($keyword = '', $category_id = 0, $min_price = 0, $max_price = 0, $sku_keyword = '') {
         $sql = "SELECT COUNT(*) as total FROM products WHERE status = 1";
         $types = "";
         $params = [];
@@ -228,6 +228,11 @@ class ProductModel extends BaseModel
             $sql .= " AND name LIKE ?";
             $types .= "s";
             $params[] = "%$keyword%";
+        }
+        if (!empty($sku_keyword)) {
+            $sql .= " AND sku LIKE ?";
+            $types .= "s";
+            $params[] = "%$sku_keyword%";
         }
         if ($category_id > 0) {
             $sql .= " AND theme_id = ?";
@@ -253,7 +258,7 @@ class ProductModel extends BaseModel
         return $stmt->get_result()->fetch_assoc()['total'];
     }
 
-    public function getFilteredProducts($limit, $offset, $keyword = '', $category_id = 0, $min_price = 0, $max_price = 0, $sort = '') {
+    public function getFilteredProducts($limit, $offset, $keyword = '', $category_id = 0, $min_price = 0, $max_price = 0, $sort = '', $sku_keyword = '') {
         $sql = "SELECT p.*, t.name as theme_name FROM products p JOIN themes t ON p.theme_id = t.id WHERE p.status = 1";
         $types = "";
         $params = [];
@@ -262,6 +267,11 @@ class ProductModel extends BaseModel
             $sql .= " AND p.name LIKE ?";
             $types .= "s";
             $params[] = "%$keyword%";
+        }
+        if (!empty($sku_keyword)) {
+            $sql .= " AND p.sku LIKE ?";
+            $types .= "s";
+            $params[] = "%$sku_keyword%";
         }
         if ($category_id > 0) {
             $sql .= " AND p.theme_id = ?";
@@ -304,6 +314,31 @@ class ProductModel extends BaseModel
         $stmt->bind_param("i", $product_id);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function getReviewStats($product_id) {
+        $stats = [
+            1 => 0,
+            2 => 0,
+            3 => 0,
+            4 => 0,
+            5 => 0
+        ];
+
+        $sql = "SELECT rating, COUNT(*) AS total FROM reviews WHERE product_id = ? GROUP BY rating";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $product_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+            $rating = (int) $row['rating'];
+            if ($rating >= 1 && $rating <= 5) {
+                $stats[$rating] = (int) $row['total'];
+            }
+        }
+
+        return $stats;
     }
 
     public function checkUserBoughtProduct($user_id, $product_id) {

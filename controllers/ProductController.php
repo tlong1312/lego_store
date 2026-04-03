@@ -4,9 +4,12 @@ class ProductController extends BaseController{
         $productModel = new ProductModel();
         
         $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+        $sku_keyword = isset($_GET['sku_keyword']) ? trim($_GET['sku_keyword']) : '';
         $category_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : 0;
         $price_range = isset($_GET['price_range']) ? $_GET['price_range'] : '';
         $sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+        $price_from = isset($_GET['price_from']) ? preg_replace('/[^0-9]/', '', $_GET['price_from']) : '';
+        $price_to = isset($_GET['price_to']) ? preg_replace('/[^0-9]/', '', $_GET['price_to']) : '';
         
         $min_price = 0;
         $max_price = 0;
@@ -19,19 +22,34 @@ class ProductController extends BaseController{
             case '8m_10m': $min_price = 8000000; $max_price = 10000000; break;
             case 'over_10m': $min_price = 10000000; $max_price = 999999999; break;
         }
+
+        if ($price_from !== '') {
+            $min_price = (float) $price_from;
+        }
+        if ($price_to !== '') {
+            $max_price = (float) $price_to;
+        }
+        if ($max_price > 0 && $min_price > $max_price) {
+            $temp = $min_price;
+            $min_price = $max_price;
+            $max_price = $temp;
+        }
         
         $limit = 12; 
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
         if ($page < 1) $page = 1;
         $offset = ($page - 1) * $limit; 
         
-        $total_products = $productModel->getTotalFilteredProducts($keyword, $category_id, $min_price, $max_price);
+        $total_products = $productModel->getTotalFilteredProducts($keyword, $category_id, $min_price, $max_price, $sku_keyword);
         $total_pages = ceil($total_products / $limit); 
         
-        $data['products'] = $productModel->getFilteredProducts($limit, $offset, $keyword, $category_id, $min_price, $max_price, $sort);
+        $data['products'] = $productModel->getFilteredProducts($limit, $offset, $keyword, $category_id, $min_price, $max_price, $sort, $sku_keyword);
         $data['themes'] = $productModel->getAllThemes();
         
         $data['keyword'] = $keyword;
+        $data['sku_keyword'] = $sku_keyword;
+        $data['price_from'] = $price_from;
+        $data['price_to'] = $price_to;
         $data['category_id'] = $category_id;
         $data['price_range'] = $price_range;
         $data['sort'] = $sort;
@@ -42,6 +60,59 @@ class ProductController extends BaseController{
         $this->view('layouts/client_header');
         $this->view('client/product_list', $data);
         $this->view('layouts/client_footer');
+    }
+
+    public function filter() {
+        $productModel = new ProductModel();
+        
+        $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
+        $sku_keyword = isset($_GET['sku_keyword']) ? trim($_GET['sku_keyword']) : '';
+        $category_id = isset($_GET['category_id']) ? (int)$_GET['category_id'] : 0;
+        $price_range = isset($_GET['price_range']) ? $_GET['price_range'] : '';
+        $sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+        $price_from = isset($_GET['price_from']) ? preg_replace('/[^0-9]/', '', $_GET['price_from']) : '';
+        $price_to = isset($_GET['price_to']) ? preg_replace('/[^0-9]/', '', $_GET['price_to']) : '';
+        
+        $min_price = 0;
+        $max_price = 0;
+        
+        switch($price_range) {
+            case 'under_1m': $min_price = 0; $max_price = 1000000; break;
+            case '1m_3m': $min_price = 1000000; $max_price = 3000000; break;
+            case '3m_5m': $min_price = 3000000; $max_price = 5000000; break;
+            case '5m_8m': $min_price = 5000000; $max_price = 8000000; break;
+            case '8m_10m': $min_price = 8000000; $max_price = 10000000; break;
+            case 'over_10m': $min_price = 10000000; $max_price = 999999999; break;
+        }
+
+        if ($price_from !== '') {
+            $min_price = (float) $price_from;
+        }
+        if ($price_to !== '') {
+            $max_price = (float) $price_to;
+        }
+        if ($max_price > 0 && $min_price > $max_price) {
+            $temp = $min_price;
+            $min_price = $max_price;
+            $max_price = $temp;
+        }
+        
+        $limit = 12; 
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; 
+        if ($page < 1) $page = 1;
+        $offset = ($page - 1) * $limit; 
+        
+        $total_products = $productModel->getTotalFilteredProducts($keyword, $category_id, $min_price, $max_price, $sku_keyword);
+        $total_pages = ceil($total_products / $limit); 
+        
+        $data['products'] = $productModel->getFilteredProducts($limit, $offset, $keyword, $category_id, $min_price, $max_price, $sort, $sku_keyword);
+        
+        $data['current_page'] = $page;
+        $data['total_pages'] = $total_pages;
+        $data['total_products'] = $total_products;
+
+        // Trả về partial view
+        $this->view('client/_product_list_partial', $data);
     }
 
     public function detail() {
@@ -64,6 +135,7 @@ class ProductController extends BaseController{
         $data['gia_ban'] = $product['import_price'] * (1 + $product['profit_margin'] / 100);
 
         $data['reviews'] = $productModel->getProductReviews($id);
+        $data['review_stats'] = $productModel->getReviewStats($id);
         $total_rating = 0;
         $review_count = count($data['reviews']);
         

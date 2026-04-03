@@ -4072,3 +4072,381 @@ ol {
 .product__item .add-cart.disabled-cart:hover {
     background: #b2b2b2; /* Giữ nguyên màu khi hover */
 }
+
+/* Client profile page */
+.mk-profile-wrap {
+	background: linear-gradient(180deg, #fffaf8 0%, #ffffff 100%);
+	border: 1px solid #ffd6cf;
+	border-radius: 18px;
+	padding: 28px 24px;
+	box-shadow: 0 14px 34px rgba(213, 43, 30, 0.08);
+}
+
+.mk-profile-title {
+	font-weight: 900;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	margin-bottom: 6px;
+	color: #d52b1e;
+}
+
+.mk-profile-subtitle {
+	margin-bottom: 24px;
+	color: #667085;
+	font-size: 14px;
+}
+
+.mk-profile-card {
+	background: #fff;
+	border: 1px solid #ffd9d4;
+	border-radius: 14px;
+	padding: 20px;
+	height: 100%;
+}
+
+.mk-profile-card h5 {
+	font-weight: 800;
+	margin-bottom: 15px;
+	color: #101828;
+}
+
+.mk-input-label {
+	font-size: 13px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: #344054;
+	margin-bottom: 6px;
+	display: block;
+}
+
+.mk-input,
+.mk-input:focus,
+.mk-select,
+.mk-select:focus {
+	border: 2px solid #d52b1e;
+	border-radius: 10px;
+	box-shadow: none;
+	height: 48px;
+	color: #101828;
+	background-color: #fff;
+}
+
+.mk-textarea,
+.mk-textarea:focus {
+	border: 2px solid #d52b1e;
+	border-radius: 10px;
+	box-shadow: none;
+	color: #101828;
+}
+
+.mk-input[readonly] {
+	background: #fff5f3;
+	color: #7a2e27;
+	cursor: not-allowed;
+}
+
+.mk-inline-note {
+	font-size: 12px;
+	color: #667085;
+	margin-top: 5px;
+}
+
+.mk-error {
+	color: #b42318;
+	font-size: 12px;
+	margin-top: 4px;
+	min-height: 18px;
+}
+
+.mk-js-error {
+	display: block;
+}
+
+.mk-btn-primary {
+	border: 0;
+	background: #d52b1e;
+	color: #fff;
+	font-weight: 800;
+	height: 46px;
+	border-radius: 999px;
+	padding: 0 20px;
+}
+
+.mk-btn-primary:hover {
+	background: #b12015;
+	color: #fff;
+}
+
+.mk-divider {
+	margin: 0 0 20px;
+	border-color: #ffe3df;
+}
+
+.mk-profile-card .nice-select {
+	width: 100%;
+	height: 48px;
+	line-height: 44px;
+	border: 2px solid #d52b1e;
+	border-radius: 10px;
+	padding-left: 14px;
+	float: none;
+	font-size: 14px;
+	color: #101828;
+}
+
+.mk-profile-card .nice-select .list {
+	width: 100%;
+	max-height: 230px;
+	overflow-y: auto;
+}
+
+.mk-profile-card .nice-select:after {
+	right: 14px;
+	height: 8px;
+	width: 8px;
+	border-bottom: 2px solid #d52b1e;
+	border-right: 2px solid #d52b1e;
+}
+
+.mk-profile-card .is-invalid,
+.mk-profile-card .is-invalid:focus,
+.mk-profile-card .mk-invalid-select {
+	border-color: #b42318 !important;
+}
+
+@media (max-width: 767px) {
+	.mk-profile-wrap {
+		padding: 18px 14px;
+	}
+
+	.mk-profile-card {
+		padding: 16px;
+	}
+}
+
+/* Header inline search */
+.header > .container > .row {
+	align-items: center;
+}
+
+.header__logo,
+.header__menu,
+.header__nav__option {
+	padding-top: 24px;
+	padding-bottom: 24px;
+}
+
+.header__menu {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.header__menu > ul {
+	display: flex;
+	align-items: center;
+}
+
+/* Keep utility dropdown vertical; do not inherit top-level flex menu layout. */
+.header__menu ul.dropdown {
+	display: block !important;
+}
+
+.header__menu ul.dropdown li {
+	display: block !important;
+}
+
+.header__nav__option {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: nowrap;
+}
+
+.header__nav__option a {
+	margin-right: 0;
+	flex-shrink: 0;
+}
+
+.header__search-form {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	max-width: 220px;
+	border: 1px solid #d0d5dd;
+	border-radius: 999px;
+	padding: 0 6px 0 12px;
+	height: 40px;
+	background: #fff;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.header__search-input {
+	border: 0;
+	outline: 0;
+	flex: 1;
+	font-size: 13px;
+	color: #111111;
+	background: transparent;
+	min-width: 0;
+}
+
+.header__search-input::placeholder {
+	color: #98a2b3;
+}
+
+.header__search-btn {
+	border: 0;
+	background: #e53637;
+	color: #fff;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	padding: 0;
+}
+
+.header__search-btn:hover {
+	background: #b12015;
+}
+
+.header__search-btn .icon_search {
+	font-size: 12px;
+}
+
+.offcanvas__search-form {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	max-width: 260px;
+	border: 1px solid #d0d5dd;
+	border-radius: 999px;
+	padding: 0 6px 0 12px;
+	height: 40px;
+	background: #fff;
+	margin: 0 auto 10px;
+}
+
+.offcanvas__search-input {
+	border: 0;
+	outline: 0;
+	flex: 1;
+	font-size: 13px;
+	color: #111111;
+	background: transparent;
+	min-width: 0;
+}
+
+.offcanvas__search-btn {
+	border: 0;
+	background: #e53637;
+	color: #fff;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	padding: 0;
+}
+
+.offcanvas__search-btn:hover {
+	background: #b12015;
+}
+
+.header__cart-link,
+.offcanvas__cart-link {
+	position: relative;
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border: 1px solid #e4e7ec;
+	border-radius: 50%;
+	background: #fff;
+	margin-right: 0 !important;
+	flex-shrink: 0;
+}
+
+.header__cart-link img,
+.offcanvas__cart-link img {
+	width: 18px;
+	height: 18px;
+	object-fit: contain;
+}
+
+.header__cart-link .cart-badge,
+.offcanvas__cart-link .cart-badge {
+	position: absolute;
+	top: -7px;
+	right: -7px;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 5px;
+	border-radius: 999px;
+	background: #e53637;
+	color: #fff;
+	font-size: 10px;
+	font-weight: 800;
+	line-height: 18px;
+	text-align: center;
+	box-shadow: 0 0 0 2px #fff;
+	left: auto !important;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+	.header__logo,
+	.header__menu,
+	.header__nav__option {
+		padding-top: 18px;
+		padding-bottom: 18px;
+	}
+
+	.header__search-form {
+		max-width: 160px;
+		height: 36px;
+	}
+
+	.header__search-btn {
+		width: 26px;
+		height: 26px;
+	}
+
+	.header__nav__option {
+		gap: 8px;
+	}
+}
+
+@media only screen and (max-width: 767px) {
+	.header__logo {
+		padding: 10px 0 8px !important;
+	}
+
+	.header__logo img {
+		max-width: 168px;
+		height: auto;
+	}
+
+	/* On mobile, use offcanvas menu only: hide desktop nav/search/cart row items. */
+	.header__menu,
+	.header__nav__option {
+		display: none !important;
+	}
+
+	.header > .container > .row {
+		min-height: 56px;
+	}
+
+	.canvas__open {
+		top: 10px;
+		right: 12px;
+	}
+}

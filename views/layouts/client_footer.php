@@ -65,22 +65,6 @@
 </footer>
 <!-- Footer Section End -->
 
-<!-- Search Begin -->
-<div class="search-model">
-    <div class="h-100 d-flex align-items-center justify-content-center">
-        <div class="search-close-switch">+</div>
-        <form class="search-model-form" action="index.php" method="GET">
-            <input type="hidden" name="controller" value="product">
-            <input type="hidden" name="action" value="index">
-            <input type="text" name="keyword" id="search-input" placeholder="Tìm kiếm bộ lắp ráp...">
-            <button type="submit" style="background: none; border: none; cursor: pointer;">
-                <span class="icon_search"></span>
-            </button>
-        </form>
-    </div>
-</div>
-<!-- Search End -->
-
 <!-- Js Plugins -->
 <script src="public/client/js/jquery-3.3.1.min.js"></script>
 <script src="public/client/js/bootstrap.min.js"></script>
@@ -92,6 +76,159 @@
 <script src="public/client/js/mixitup.min.js"></script>
 <script src="public/client/js/owl.carousel.min.js"></script>
 <script src="public/client/js/main.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Chỉ thực thi mã này trên trang product list
+    if ($('#product-list-container').length) {
+        let currentPage = $('#product-list-data').data('current-page');
+        let activeFilterMode = 'horizontal';
+
+        function formatPriceInputValue(value) {
+            const digits = String(value || '').replace(/\D/g, '');
+            if (!digits) {
+                return '';
+            }
+            return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function buildUrl(params) {
+            const query = new URLSearchParams(params).toString();
+            return `index.php?controller=product&action=index&${query}`;
+        }
+
+        function collectHorizontalParams(page = 1) {
+            return {
+                page: page,
+                keyword: $('#searchForm input[name="keyword"]').val() || '',
+                category_id: $('#searchForm select[name="category_id"]').val() || 0,
+                price_from: $('#searchForm input[name="price_from"]').val() || '',
+                price_to: $('#searchForm input[name="price_to"]').val() || '',
+                price_range: '',
+                sort: $('#sort-select').val() || ''
+            };
+        }
+
+        function collectSidebarParams(page = 1) {
+            return {
+                page: page,
+                keyword: '',
+                category_id: $('#filterForm input[name="category_id"]:checked').val() || 0,
+                price_from: '',
+                price_to: '',
+                price_range: $('#filterForm input[name="price_range"]:checked').val() || '',
+                sort: $('#sort-select').val() || ''
+            };
+        }
+
+        function fetchProducts(params) {
+            currentPage = params.page || 1;
+
+            // Hiển thị hiệu ứng loading
+            $('#product-list-container').append('<div class="loading-overlay"><div class="loader"></div><span>Đang tải sản phẩm...</span></div>');
+
+            $.ajax({
+                url: 'index.php?controller=product&action=filter',
+                type: 'GET',
+                data: params,
+                success: function(response) {
+                    // Cập nhật URL trình duyệt
+                    const newUrl = buildUrl(params);
+                    history.pushState({path: newUrl}, '', newUrl);
+
+                    // Cập nhật nội dung
+                    $('#product-list-container').html(response);
+                    
+                    // Cập nhật thông tin số lượng sản phẩm
+                    const totalProducts = $('#product-list-data').data('total-products');
+                    const productCount = $('#product-list-data').data('product-count');
+                    $('#product-count-info').text(`Hiển thị ${productCount} của ${totalProducts} sản phẩm`);
+
+
+                    // Khởi tạo lại các plugin JS cho sản phẩm mới
+                    $('.set-bg').each(function () {
+                        var bg = $(this).data('setbg');
+                        $(this).css('background-image', 'url(' + bg + ')');
+                    });
+                },
+                error: function() {
+                    alert('Đã có lỗi xảy ra. Vui lòng thử lại.');
+                    $('#product-list-container .loading-overlay').remove();
+                }
+            });
+        }
+
+        function applyHorizontalFilter(page = 1) {
+            activeFilterMode = 'horizontal';
+            fetchProducts(collectHorizontalParams(page));
+        }
+
+        function applySidebarFilter(page = 1) {
+            activeFilterMode = 'sidebar';
+            fetchProducts(collectSidebarParams(page));
+        }
+
+        // Format nhanh cho ô giá khi nhập
+        $('#searchForm input[name="price_from"], #searchForm input[name="price_to"]').on('input', function() {
+            this.value = formatPriceInputValue(this.value);
+        });
+
+        // Nút gợi ý +000.000 để tăng nhanh giá trị
+        $('.price-shortcut-btn').on('click', function() {
+            const targetId = $(this).data('target');
+            const $target = $('#' + targetId);
+            if (!$target.length) {
+                return;
+            }
+            const currentDigits = ($target.val() || '').replace(/\D/g, '');
+            const nextDigits = (currentDigits || '1') + '000000';
+            $target.val(formatPriceInputValue(nextDigits));
+            $target.trigger('focus');
+        });
+
+        // Bắt sự kiện thay đổi bộ lọc
+        $('#filterForm input[type="radio"]').on('change', function() {
+            applySidebarFilter(1); // Lọc riêng cho sidebar
+        });
+
+        // Sort theo chế độ lọc hiện tại (ngang hoặc dọc)
+        $('#sort-select').on('change', function() {
+            if (activeFilterMode === 'sidebar') {
+                applySidebarFilter(1);
+            } else {
+                applyHorizontalFilter(1);
+            }
+        });
+
+        // Bắt sự kiện submit form tìm kiếm
+        $('#searchForm').on('submit', function(e) {
+            e.preventDefault();
+            applyHorizontalFilter(1); // Chỉ bấm nút Lọc mới chạy
+        });
+
+        // Nút reset trên bộ lọc ngang
+        $('#filter-reset-btn').on('click', function() {
+            $('#searchForm').trigger('reset');
+            $('#searchForm select[name="category_id"]').val('0');
+            $('#sort-select').val('');
+            applyHorizontalFilter(1);
+        });
+
+        // Bắt sự kiện click vào phân trang
+        $(document).on('click', '.product__pagination a', function(e) {
+            e.preventDefault();
+            const page = $(this).data('page');
+            if (page) {
+                if (activeFilterMode === 'sidebar') {
+                    applySidebarFilter(page);
+                } else {
+                    applyHorizontalFilter(page);
+                }
+            }
+        });
+    }
+});
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
