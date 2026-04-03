@@ -102,13 +102,6 @@
                 </form>
             </div>
             <div class="col-lg-4">
-                <div class="cart__discount">
-                    <h6>Mã Giảm Giá</h6>
-                    <form action="#">
-                        <input type="text" placeholder="Nhập mã ưu đãi...">
-                        <button type="submit">Áp Dụng</button>
-                    </form>
-                </div>
                 <div class="cart__total">
                     <h6>Tổng Giỏ Hàng</h6>
                     <ul>

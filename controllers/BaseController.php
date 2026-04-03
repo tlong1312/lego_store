@@ -16,5 +16,13 @@ class BaseController {
         header("Location: " . $url);
         exit();
     }
+
+    protected function requireAdminLogin() {
+        if (!isset($_SESSION['user']) || !isset($_SESSION['user']['role']) || $_SESSION['user']['role'] !== 'admin') {
+            $_SESSION['flash_type'] = 'warning';
+            $_SESSION['flash_msg'] = 'Vui lòng đăng nhập tài khoản quản trị để truy cập trang này!';
+            $this->redirect('index.php?controller=auth&action=adminLogin');
+        }
+    }
 }
 ?>

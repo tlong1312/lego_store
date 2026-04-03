@@ -44,12 +44,15 @@
 
                         <div class="col-md-2 mb-3">
                             <label class="form-label fw-bold">Số lượng</label>
-                            <input type="number" id="quantity" class="form-control text-center" value="1" min="1" oninput="if(this.value < 1) this.value = 1;" required>
+                            <input type="number" id="quantity" class="form-control text-center" value="1" min="1" oninput="if(this.value < 0) this.value = 0;" required>
                         </div>
 
                         <div class="col-md-3 mb-3">
                             <label class="form-label fw-bold">Giá Nhập (VNĐ)</label>
-                            <input type="number" min="0" id="import_price" class="form-control text-end" placeholder="VD: 500000" oninput="if(this.value < 0) this.value = 0;" required>
+                            <div class="input-group">
+                                <input type="text" id="import_price" class="form-control text-end" placeholder="VD: 500.000" inputmode="numeric" autocomplete="off" required>
+                                <button type="button" class="btn btn-outline-secondary" id="btn-plus-000" title="Thêm nhanh 000 vào cuối số hiện tại">+000</button>
+                            </div>
                         </div>
 
                         <div class="col-md-2 mb-3 d-grid">
@@ -170,6 +173,46 @@
 <?php if (!$is_completed): ?>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const importPriceInput = document.getElementById('import_price');
+            const btnPlus000 = document.getElementById('btn-plus-000');
+
+            function normalizeDigits(value) {
+                return String(value || '').replace(/\D/g, '');
+            }
+
+            function formatThousands(value) {
+                const digits = normalizeDigits(value);
+                if (!digits) {
+                    return '';
+                }
+
+                const normalized = String(parseInt(digits, 10));
+                return normalized.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+
+            function getRawImportPrice() {
+                return normalizeDigits(importPriceInput ? importPriceInput.value : '');
+            }
+
+            if (importPriceInput) {
+                importPriceInput.addEventListener('input', function () {
+                    this.value = formatThousands(this.value);
+                });
+
+                importPriceInput.addEventListener('blur', function () {
+                    this.value = formatThousands(this.value);
+                });
+            }
+
+            if (btnPlus000 && importPriceInput) {
+                btnPlus000.addEventListener('click', function () {
+                    const digits = getRawImportPrice();
+                    const nextValue = digits ? (digits + '000') : '1000';
+                    importPriceInput.value = formatThousands(nextValue);
+                    importPriceInput.focus();
+                });
+            }
+
             
             // 1. XỬ LÝ NÚT THÊM SẢN PHẨM QUA AJAX
             const btnAddItem = document.getElementById('btnAddItem');
@@ -178,7 +221,7 @@
                     const receiptId = document.getElementById('receipt_id').value;
                     const productId = document.getElementById('product_id').value;
                     const quantity = document.getElementById('quantity').value;
-                    const importPrice = document.getElementById('import_price').value;
+                    const importPrice = getRawImportPrice();
 
                     if (!productId || !quantity || !importPrice) {
                         alert('Vui lòng nhập đủ thông tin sản phẩm, số lượng và giá nhập!');

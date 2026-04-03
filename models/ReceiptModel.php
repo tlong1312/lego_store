@@ -18,12 +18,33 @@ class ReceiptModel extends BaseModel
 
     public function createDraftReceipt($user_id)
     {
+        $user_id = (int) $user_id;
+        if ($user_id <= 0) {
+            return false;
+        }
+
+        $checkSql = "SELECT id FROM users WHERE id = ? LIMIT 1";
+        $checkStmt = $this->conn->prepare($checkSql);
+        $checkStmt->bind_param("i", $user_id);
+        $checkStmt->execute();
+
+        $checkResult = $checkStmt->get_result();
+        if (!$checkResult || $checkResult->num_rows === 0) {
+            return false;
+        }
+
         $sql = "INSERT INTO receipts (user_id, status, total_amount) VALUES (?, 0, 0)";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $user_id);
-        if ($stmt->execute()) {
-            return $this->conn->insert_id;
+
+        try {
+            if ($stmt->execute()) {
+                return $this->conn->insert_id;
+            }
+        } catch (mysqli_sql_exception $e) {
+            return false;
         }
+
         return false;
     }
 

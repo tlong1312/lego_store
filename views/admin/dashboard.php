@@ -5,10 +5,17 @@
             <div class="d-flex align-items-end row">
                 <div class="col-sm-7">
                     <div class="card-body">
-                        <h5 class="card-title text-primary">Xin chào Admin! 🎉</h5>
-                        <p class="mb-4">
+                        <h5 class="card-title text-primary">Xin chào, <?= htmlspecialchars($adminDisplayName ?? 'Admin') ?>! 🎉</h5>
+                        <p class="mb-2">
                             Hệ thống quản lý <span class="fw-bold">LEGO Store</span> đang hoạt động rất sôi nổi.
                         </p>
+                        <div class="small text-muted">
+                            <div><i class='bx bx-user me-1'></i><?= htmlspecialchars($adminDisplayName ?? 'Admin') ?></div>
+                            <?php if (!empty($adminEmail ?? '')): ?>
+                                <div><i class='bx bx-envelope me-1'></i><?= htmlspecialchars($adminEmail) ?></div>
+                            <?php endif; ?>
+                            <div><i class='bx bx-shield-quarter me-1'></i>Quyền: <?= htmlspecialchars($adminRole ?? 'admin') ?></div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-sm-5 text-center text-sm-left">

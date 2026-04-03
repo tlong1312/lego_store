@@ -2,11 +2,22 @@
 require_once 'models/ProductModel.php';
 class DashboardController extends BaseController
 {
+    public function __construct()
+    {
+        $this->requireAdminLogin();
+    }
+
     public function index()
     {
         header("Cache-Control: no-cache, no-store, must-revalidate"); 
         header("Pragma: no-cache"); 
         header("Expires: 0"); 
+
+        $adminUser = (isset($_SESSION['user']) && is_array($_SESSION['user'])) ? $_SESSION['user'] : [];
+        $adminDisplayName = trim((string) ($adminUser['fullname'] ?? 'Admin'));
+        $adminEmail = trim((string) ($adminUser['email'] ?? ''));
+        $adminRole = trim((string) ($adminUser['role'] ?? 'admin'));
+
         $productModel = new ProductModel();
         $totalProducts = $productModel->getTotalProducts();
         require_once 'models/UserModel.php';

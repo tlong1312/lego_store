@@ -4,6 +4,11 @@ require_once 'models/CategoryModel.php';
 
 class AdminProductController extends BaseController
 {
+    public function __construct()
+    {
+        $this->requireAdminLogin();
+    }
+
     public function index()
     {
         $productModel = new ProductModel();

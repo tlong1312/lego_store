@@ -3,6 +3,11 @@ require_once 'models/ProductModel.php';
 
 class AdminReportController extends BaseController
 {
+    public function __construct()
+    {
+        $this->requireAdminLogin();
+    }
+
     public function importExport()
     {
         $productModel = new ProductModel();

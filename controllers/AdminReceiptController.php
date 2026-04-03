@@ -5,6 +5,11 @@ require_once 'models/ProductModel.php';
 class AdminReceiptController extends BaseController
 {
 
+    public function __construct()
+    {
+        $this->requireAdminLogin();
+    }
+
 
     public function index()
     {
@@ -23,8 +28,14 @@ class AdminReceiptController extends BaseController
     {
         $receiptModel = new ReceiptModel();
 
+        $user_id = (int) ($_SESSION['user']['id'] ?? 0);
 
-        $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 1;
+        if ($user_id <= 0) {
+            $_SESSION['flash_type'] = 'error';
+            $_SESSION['flash_msg'] = 'Không xác định được tài khoản quản trị đang đăng nhập. Vui lòng đăng nhập lại!';
+            header("Location: index.php?controller=auth&action=adminLogin");
+            exit();
+        }
 
         $newReceiptId = $receiptModel->createDraftReceipt($user_id);
 
@@ -32,6 +43,11 @@ class AdminReceiptController extends BaseController
             header("Location: index.php?controller=AdminReceipt&action=edit&id=" . $newReceiptId);
             exit();
         }
+
+        $_SESSION['flash_type'] = 'error';
+        $_SESSION['flash_msg'] = 'Không thể tạo phiếu nhập mới. Tài khoản tạo phiếu có thể không còn tồn tại!';
+        header("Location: index.php?controller=AdminReceipt&action=index");
+        exit();
     }
 
 

@@ -182,15 +182,40 @@ class UserModel extends BaseModel
     }
 
      
-    public function addUser($fullname, $email, $password, $phone, $address, $role)
+    public function addUser($fullname, $email, $password, $phone, $address, $province = '', $ward = '', $role = 'customer')
     {
-        $sql = "INSERT INTO users (fullname, email, password, phone, address, role, is_locked) 
-                VALUES (?, ?, ?, ?, ?, ?, 0)";
-        $stmt = $this->conn->prepare($sql);
+        $columns = $this->getUserColumns();
+
+        $insertColumns = ['fullname', 'email', 'password', 'phone', 'address', 'role'];
+        $placeholders = ['?', '?', '?', '?', '?', '?'];
+        $types = 'ssssss';
 
         $hashed_password = md5($password);
+        $params = [$fullname, $email, $hashed_password, $phone, $address, $role];
 
-        $stmt->bind_param("ssssss", $fullname, $email, $hashed_password, $phone, $address, $role);
+        if (in_array('province', $columns)) {
+            $insertColumns[] = 'province';
+            $placeholders[] = '?';
+            $types .= 's';
+            $params[] = $province;
+        }
+
+        if (in_array('ward', $columns)) {
+            $insertColumns[] = 'ward';
+            $placeholders[] = '?';
+            $types .= 's';
+            $params[] = $ward;
+        }
+
+        if (in_array('is_locked', $columns)) {
+            $insertColumns[] = 'is_locked';
+            $placeholders[] = '0';
+        }
+
+        $sql = 'INSERT INTO users (' . implode(', ', $insertColumns) . ') VALUES (' . implode(', ', $placeholders) . ')';
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+
         return $stmt->execute();
     }
 

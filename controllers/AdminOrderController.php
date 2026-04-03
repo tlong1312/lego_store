@@ -3,6 +3,11 @@ require_once 'models/OrderModel.php';
 
 class AdminOrderController extends BaseController
 {
+    public function __construct()
+    {
+        $this->requireAdminLogin();
+    }
+
     public function index()
     {
         $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';

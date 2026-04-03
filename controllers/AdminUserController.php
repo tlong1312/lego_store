@@ -4,6 +4,11 @@ require_once 'models/UserModel.php';
 class AdminUserController extends BaseController
 {
 
+    public function __construct()
+    {
+        $this->requireAdminLogin();
+    }
+
     public function index()
     {
         $userModel = new UserModel();

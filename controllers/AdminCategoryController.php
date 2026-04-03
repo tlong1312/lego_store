@@ -3,6 +3,10 @@ require_once 'models/CategoryModel.php';
 
 class AdminCategoryController extends BaseController
 {
+    public function __construct()
+    {
+        $this->requireAdminLogin();
+    }
 
     public function index()
     {
