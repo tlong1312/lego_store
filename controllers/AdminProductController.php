@@ -278,5 +278,21 @@ class AdminProductController extends BaseController
         require_once 'views/admin/product_stock_history.php';
         require_once 'views/layouts/admin_footer.php';
     }
+    public function updateGlobalThreshold() 
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['threshold_value'])) {
+            $threshold = (int)$_POST['threshold_value'];
+            
+            $productModel = new ProductModel(); 
+            
+            if ($productModel->updateAllLowStockThreshold($threshold)) {
+                header("Location: index.php?controller=AdminProduct&action=index&msg=threshold_success");
+                exit();
+            } else {
+                header("Location: index.php?controller=AdminProduct&action=index&msg=threshold_error");
+                exit();
+            }
+        }
+    }
 }
 ?>

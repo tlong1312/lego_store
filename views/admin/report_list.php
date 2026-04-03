@@ -24,13 +24,13 @@
 
             <div class="col-md-3">
                 <label class="form-label fw-bold">Từ ngày</label>
-                <input type="date" class="form-control" name="start_date" required max="<?= date('Y-m-d') ?>"
+                <input type="date" class="form-control" name="start_date" required 
                     value="<?= isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-01') ?>">
             </div>
 
             <div class="col-md-3">
                 <label class="form-label fw-bold">Đến hết ngày</label>
-                <input type="date" class="form-control" name="end_date" required max="<?= date('Y-m-d') ?>"
+                <input type="date" class="form-control" name="end_date" required 
                     value="<?= isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d') ?>">
             </div>
 

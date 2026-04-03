@@ -20,8 +20,8 @@
                 </div>
 
                 <div class="col-md-2">
-                    <input type="date" class="form-control" name="date"
-                        value="<?= isset($_GET['date']) ? $_GET['date'] : '' ?>" title="Lọc theo ngày đặt hàng">
+                    <input type="date" class="form-control" name="date" value="<?= isset($_GET['date']) ? $_GET['date'] : '' ?>" 
+        title="Lọc theo ngày đặt hàng" onchange="this.form.submit()">
                 </div>
 
                 <div class="col-md-2">
@@ -39,9 +39,10 @@
                     <?php $currentWard = isset($_GET['ward']) ? $_GET['ward'] : ''; ?>
                     <select class="form-select border-info" name="ward" onchange="this.form.submit()">
                         <option value="">Tất cả khu vực</option>
-                        <?php if(!empty($wardsList)): ?>
-                            <?php foreach($wardsList as $w): ?>
-                                <option value="<?= htmlspecialchars($w['shipping_ward']) ?>" <?= $currentWard === $w['shipping_ward'] ? 'selected' : '' ?>>
+                        <?php if (!empty($wardsList)): ?>
+                            <?php foreach ($wardsList as $w): ?>
+                                <option value="<?= htmlspecialchars($w['shipping_ward']) ?>"
+                                    <?= $currentWard === $w['shipping_ward'] ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($w['shipping_ward']) ?>
                                 </option>
                             <?php endforeach; ?>
@@ -86,7 +87,7 @@
                                 <td>
                                     <strong><?= htmlspecialchars($order['fullname']) ?></strong><br>
                                     <small class="text-muted"><?= htmlspecialchars($order['phone']) ?></small><br>
-                                    <small class="text-primary"><i class="bx bx-map"></i> 
+                                    <small class="text-primary"><i class="bx bx-map"></i>
                                         <?= !empty($order['shipping_ward']) ? htmlspecialchars($order['shipping_ward']) : 'Chưa cập nhật ĐC' ?>
                                     </small>
                                 </td>

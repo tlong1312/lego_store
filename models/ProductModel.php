@@ -520,5 +520,17 @@ class ProductModel extends BaseModel
 
         return $result && $result->num_rows > 0 ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
+
+    public function updateAllLowStockThreshold($threshold) 
+    {
+        $sql = "UPDATE products SET low_stock_threshold = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $threshold);
+        
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
 }
 ?>

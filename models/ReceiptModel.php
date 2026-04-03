@@ -89,7 +89,7 @@ class ReceiptModel extends BaseModel
         $stmt->execute();
     }
 
-    public function completeReceipt($receiptId)
+    public function completeReceipt($receiptId, $importDate)
     {
         $sqlDetails = "SELECT product_id, quantity, import_price FROM receipt_details WHERE receipt_id = ?";
         $stmtDetails = $this->conn->prepare($sqlDetails);
@@ -128,9 +128,13 @@ class ReceiptModel extends BaseModel
             }
         }
 
-        $sqlUpdateReceipt = "UPDATE receipts SET status = 1 WHERE id = ?";
+        
+        $importDateTime = $importDate . ' ' . date('H:i:s'); 
+
+        $sqlUpdateReceipt = "UPDATE receipts SET status = 1, created_at = ? WHERE id = ?";
         $stmtReceipt = $this->conn->prepare($sqlUpdateReceipt);
-        $stmtReceipt->bind_param("i", $receiptId);
+        
+        $stmtReceipt->bind_param("si", $importDateTime, $receiptId);
 
         return $stmtReceipt->execute();
     }

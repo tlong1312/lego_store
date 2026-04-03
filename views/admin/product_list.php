@@ -16,16 +16,14 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 </nav>
 
 <div class="card mt-3">
-    <div class="card-header d-flex justify-content-between align-items-center pb-0">
-        <h5 class="mb-0">Danh Sách Sản Phẩm</h5>
+    <div class="card-header d-flex justify-content-between align-items-center pb-0 mb-2">
+        <h5 class="mb-1 ms-2">Danh Sách Sản Phẩm</h5>
 
-        <div class="d-flex justify-content-center align-items-center mb-4">
+        <div class="d-flex justify-content-center align-items-center mb-2 ms-4">
             <div class="form-check form-check-inline me-4">
                 <input class="form-check-input filter-radio" type="radio" name="statusFilter" id="filterAll" value="all"
                     checked style="cursor: pointer;">
@@ -45,9 +43,15 @@
             </div>
         </div>
 
-        <a href="index.php?controller=AdminProduct&action=add" class="btn btn-primary">
-            <i class="bx bx-plus me-1"></i>Thêm Mới
-        </a>
+        <div>
+            <button type="button" class="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#thresholdModal">
+                <i class='bx bx-slider me-1'></i> Đặt định mức tồn kho
+            </button>
+            
+            <a href="index.php?controller=AdminProduct&action=add" class="btn btn-primary">
+                <i class="bx bx-plus me-1"></i>Thêm Mới
+            </a>
+        </div>
     </div>
 
     <div class="card-body mt-2">
@@ -86,11 +90,9 @@
 
                                 <td class="text-center">
                                     <?php
-
                                     $selling_price = $item['import_price'] + ($item['import_price'] * $item['profit_margin'] / 100);
                                     ?>
-                                    <strong class="text-primary fs-6"><?= number_format($selling_price, 0, ',', '.') ?>
-                                        đ</strong>
+                                    <strong class="text-primary fs-6"><?= number_format($selling_price, 0, ',', '.') ?> đ</strong>
                                     <br>
                                     <small class="text-muted" style="font-size: 11px;" title="Giá nhập gốc">
                                         Gốc: <?= number_format($item['import_price'], 0, ',', '.') ?> đ
@@ -99,14 +101,12 @@
 
                                 <td class="text-center align-middle">
                                     <?php
-
-                                    $currentStock = $item['stock_quantity'] ?? 0;
-
-                                    $lowStockThreshold = $item['low_stock_threshold'] ?? 5;
+                                    // BỔ SUNG: Ép kiểu (int) cực kỳ quan trọng để không bị lỗi 100 <= 10
+                                    $currentStock = (int)($item['stock_quantity'] ?? 0);
+                                    $lowStockThreshold = (int)($item['low_stock_threshold'] ?? 10);
 
                                     $textColor = '';
                                     $stockLabel = '';
-
 
                                     if ($currentStock <= 0) {
                                         $textColor = 'text-danger';
@@ -134,32 +134,25 @@
                                         class="form-select form-select-sm text-center fw-bold update-status-select <?= $item['status'] == 1 ? 'bg-success text-white' : 'bg-secondary text-white' ?>"
                                         data-id="<?= $item['id'] ?>"
                                         style="width: 90px; margin: 0 auto; border: none; cursor: pointer; padding: 6px 12px; font-size: 12px;">
-                                        <option value="1" <?= $item['status'] == 1 ? 'selected' : '' ?> class="bg-white text-dark">
-                                            ĐANG BÁN</option>
-                                        <option value="0" <?= $item['status'] == 0 ? 'selected' : '' ?> class="bg-white text-dark">
-                                            CHƯA BÁN</option>
+                                        <option value="1" <?= $item['status'] == 1 ? 'selected' : '' ?> class="bg-white text-dark">ĐANG BÁN</option>
+                                        <option value="0" <?= $item['status'] == 0 ? 'selected' : '' ?> class="bg-white text-dark">CHƯA BÁN</option>
                                     </select>
                                 </td>
 
                                 <td class="text-center">
                                     <div class="dropdown">
-                                        <button type="button"
-                                            class="btn btn-sm btn-icon btn-outline-secondary dropdown-toggle hide-arrow"
-                                            data-bs-toggle="dropdown">
+                                        <button type="button" class="btn btn-sm btn-icon btn-outline-secondary dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                                             <i class="bx bx-dots-vertical-rounded"></i>
                                         </button>
                                         <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item"
-                                                href="index.php?controller=AdminProduct&action=show&id=<?= $item['id'] ?>">
+                                            <a class="dropdown-item" href="index.php?controller=AdminProduct&action=show&id=<?= $item['id'] ?>">
                                                 <i class="bx bx-show me-1"></i> Xem
                                             </a>
-                                            <a class="dropdown-item"
-                                                href="index.php?controller=AdminProduct&action=edit&id=<?= $item['id'] ?>">
+                                            <a class="dropdown-item" href="index.php?controller=AdminProduct&action=edit&id=<?= $item['id'] ?>">
                                                 <i class="bx bx-edit-alt me-1"></i> Sửa
                                             </a>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item text-danger btn-delete-product" href="javascript:void(0);"
-                                                data-id="<?= $item['id'] ?>" data-name="<?= htmlspecialchars($item['name']) ?>">
+                                            <a class="dropdown-item text-danger btn-delete-product" href="javascript:void(0);" data-id="<?= $item['id'] ?>" data-name="<?= htmlspecialchars($item['name']) ?>">
                                                 <i class="bx bx-trash me-1"></i> Xóa
                                             </a>
                                         </div>
@@ -169,12 +162,33 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="8" class="text-center py-4">Chưa có sản phẩm nào khớp với tìm kiếm hoặc trong cơ sở
-                                dữ liệu.</td>
+                            <td colspan="8" class="text-center py-4">Chưa có sản phẩm nào khớp với tìm kiếm hoặc trong cơ sở dữ liệu.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="thresholdModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <form action="index.php?controller=AdminProduct&action=updateGlobalThreshold" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Đặt định mức "Sắp hết"</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Sẽ báo "Sắp hết" khi tồn kho dưới mức:</label>
+                    <input type="number" name="threshold_value" class="form-control" required min="1" placeholder="Ví dụ: 10">
+                    <small class="text-muted mt-2 d-block">Mức này sẽ được áp dụng cho toàn bộ sản phẩm hiện có.</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-warning">Áp dụng cho Tất Cả</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -190,14 +204,12 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-
         const statusSelects = document.querySelectorAll('.update-status-select');
         statusSelects.forEach(select => {
             select.addEventListener('change', function () {
                 const productId = this.getAttribute('data-id');
                 const newStatus = this.value;
                 const selectElement = this;
-
 
                 if (newStatus == '1') {
                     selectElement.classList.remove('bg-secondary');
@@ -222,11 +234,9 @@
             });
         });
 
-
         const searchInput = document.getElementById('searchInput');
         const filterRadios = document.querySelectorAll('.filter-radio');
         const productRows = document.querySelectorAll('.product-row');
-
 
         function filterTable() {
             const keyword = searchInput ? searchInput.value.toLowerCase().trim() : '';
@@ -237,12 +247,8 @@
                 const productSku = row.querySelector('td:nth-child(4) code').innerText.toLowerCase();
                 const rowStatus = row.getAttribute('data-status');
 
-
                 const isMatchKeyword = productName.includes(keyword) || productSku.includes(keyword);
-
-
                 const isMatchStatus = (activeStatus === 'all') || (rowStatus === activeStatus);
-
 
                 if (isMatchKeyword && isMatchStatus) {
                     row.style.display = '';
@@ -259,7 +265,6 @@
         filterRadios.forEach(radio => {
             radio.addEventListener('change', filterTable);
         });
-
 
         document.addEventListener('click', function (e) {
             const deleteBtn = e.target.closest('.btn-delete-product');
@@ -286,7 +291,6 @@
                 });
             }
         });
-
 
         <?php if (isset($_GET['msg'])): ?>
 
@@ -324,8 +328,23 @@
                     confirmButtonColor: '#696cff'
                 });
 
-            <?php endif; ?>
+            <?php elseif ($_GET['msg'] === 'threshold_success'): ?>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: 'Đã áp dụng định mức tồn kho cho toàn bộ sản phẩm.',
+                    showConfirmButton: false,
+                    timer: 1800
+                });
 
+            <?php elseif ($_GET['msg'] === 'threshold_error'): ?>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Thất bại!',
+                    text: 'Đã có lỗi xảy ra khi cập nhật định mức tồn kho.',
+                    confirmButtonColor: '#696cff'
+                });
+            <?php endif; ?>
 
             const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?controller=AdminProduct&action=index";
             window.history.replaceState({ path: newUrl }, '', newUrl);

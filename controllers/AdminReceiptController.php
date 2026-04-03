@@ -88,8 +88,10 @@ class AdminReceiptController extends BaseController
 
     public function complete()
     {
-        if (isset($_GET['id'])) {
-            $receiptId = (int) $_GET['id'];
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id']) && isset($_POST['import_date'])) {
+            $receiptId = (int) $_POST['id'];
+            $importDate = $_POST['import_date']; 
+
             $receiptModel = new ReceiptModel();
 
             $details = $receiptModel->getReceiptDetails($receiptId);
@@ -99,13 +101,16 @@ class AdminReceiptController extends BaseController
                 exit();
             }
 
-            if ($receiptModel->completeReceipt($receiptId)) {
+            if ($receiptModel->completeReceipt($receiptId, $importDate)) {
                 header("Location: index.php?controller=AdminReceipt&action=index&msg=completed");
             } else {
-                header("Location: index.php?controller=AdminReceipt&action=edit&id=$receiptId&msg=error");
+                header("Location: index.php?controller=AdminReceipt&action=edit&id=" . $receiptId . "&msg=error");
             }
             exit();
         }
+        
+        header("Location: index.php?controller=AdminReceipt&action=index");
+        exit();
     }
 
 
@@ -138,17 +143,6 @@ class AdminReceiptController extends BaseController
                 echo "<script>alert('Phiếu nhập không tồn tại!'); window.history.back();</script>";
             }
         }
-    }
-
-    public function hasItems($receiptId)
-    {
-        $sql = "SELECT COUNT(*) as total FROM receipt_details WHERE receipt_id = ?";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $receiptId);
-        $stmt->execute();
-        $result = $stmt->get_result()->fetch_assoc();
-
-        return $result['total'] > 0;
     }
 }
 ?>
