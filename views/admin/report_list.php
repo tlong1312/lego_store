@@ -1,3 +1,16 @@
+<?php
+$selectedImportExportId = isset($_GET['product_id']) ? (int) $_GET['product_id'] : 0;
+$selectedImportExportLabel = '';
+if (!empty($allProducts)) {
+    foreach ($allProducts as $p) {
+        if ((int) $p['id'] === $selectedImportExportId) {
+            $selectedImportExportLabel = $p['name'] . (!empty($p['sku']) ? ' (' . $p['sku'] . ')' : '');
+            break;
+        }
+    }
+}
+?>
+
 <div class="card">
     <div class="card-header border-bottom">
         <h5 class="card-title mb-0">Thống kê lịch sử Nhập - Xuất</h5>
@@ -10,16 +23,27 @@
 
             <div class="col-md-4">
                 <label class="form-label fw-bold">Chọn sản phẩm</label>
-                <select class="form-select" name="product_id" required>
-                    <option value="">-- Chọn sản phẩm --</option>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bx bx-search"></i></span>
+                    <input
+                        type="text"
+                        id="import-export-product-combobox"
+                        class="form-control"
+                        list="import-export-product-list"
+                        placeholder="Nhập hoặc chọn tên/mã SKU sản phẩm..."
+                        value="<?= htmlspecialchars($selectedImportExportLabel) ?>"
+                        autocomplete="off"
+                        required>
+                </div>
+                <datalist id="import-export-product-list">
                     <?php if (!empty($allProducts)): ?>
                         <?php foreach ($allProducts as $p): ?>
-                            <option value="<?= $p['id'] ?>" <?= (isset($_GET['product_id']) && $_GET['product_id'] == $p['id']) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($p['name']) ?>
-                            </option>
+                            <?php $label = $p['name'] . (!empty($p['sku']) ? ' (' . $p['sku'] . ')' : ''); ?>
+                            <option value="<?= htmlspecialchars($label) ?>" data-id="<?= (int) $p['id'] ?>"></option>
                         <?php endforeach; ?>
                     <?php endif; ?>
-                </select>
+                </datalist>
+                <input type="hidden" name="product_id" id="import-export-product-id" value="<?= $selectedImportExportId > 0 ? $selectedImportExportId : '' ?>">
             </div>
 
             <div class="col-md-3">
@@ -113,6 +137,7 @@
                                 <th class="text-center">Số Lượng</th>
                                 <th class="text-end">Giá Nhập (VNĐ)</th>
                                 <th class="text-end">Thành Tiền</th>
+                                <th class="text-center">Chi tiết</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -130,11 +155,18 @@
                                         <td class="text-end fw-bold text-success">
                                             <?= number_format($detail['quantity'] * $detail['import_price'], 0, ',', '.') ?>đ
                                         </td>
+                                        <td class="text-center">
+                                            <a href="index.php?controller=AdminReceipt&action=edit&id=<?= (int) $detail['receipt_id'] ?>"
+                                               class="btn btn-sm btn-outline-primary"
+                                               title="Xem chi tiết phiếu nhập">
+                                                Xem
+                                            </a>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="6" class="text-center py-4 text-muted">
+                                    <td colspan="7" class="text-center py-4 text-muted">
                                         Không có dữ liệu nhập hàng nào trong khoảng thời gian này.
                                     </td>
                                 </tr>
@@ -170,6 +202,7 @@
                                 <th class="text-center">Số Lượng</th>
                                 <th class="text-end">Đơn Giá Bán</th>
                                 <th class="text-center">Trạng Thái</th>
+                                <th class="text-center">Chi tiết</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -197,11 +230,18 @@
                                             }
                                             ?>
                                         </td>
+                                        <td class="text-center">
+                                            <a href="index.php?controller=AdminOrder&action=detail&id=<?= (int) $detail['order_id'] ?>"
+                                               class="btn btn-sm btn-outline-success"
+                                               title="Xem chi tiết đơn hàng">
+                                                Xem
+                                            </a>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="6" class="text-center py-4 text-muted">
+                                    <td colspan="7" class="text-center py-4 text-muted">
                                         Không có dữ liệu bán hàng nào trong khoảng thời gian này.
                                     </td>
                                 </tr>
@@ -218,8 +258,87 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const comboInput = document.getElementById('import-export-product-combobox');
+        const hiddenProductIdInput = document.getElementById('import-export-product-id');
+        const optionElements = document.querySelectorAll('#import-export-product-list option');
         const startDateInput = document.querySelector('input[name="start_date"]');
         const endDateInput = document.querySelector('input[name="end_date"]');
+        const reportForm = comboInput ? comboInput.closest('form') : (startDateInput ? startDateInput.closest('form') : null);
+
+        if (comboInput && hiddenProductIdInput && optionElements.length) {
+            const options = Array.from(optionElements).map(function (option) {
+                return {
+                    id: option.dataset.id,
+                    label: option.value,
+                    normalized: option.value.toLowerCase()
+                };
+            });
+
+            function normalize(text) {
+                return (text || '').trim().toLowerCase();
+            }
+
+            function resolveProductId(text) {
+                const normalizedText = normalize(text);
+                if (!normalizedText) {
+                    return null;
+                }
+
+                const exactMatch = options.find(function (item) {
+                    return item.normalized === normalizedText;
+                });
+                if (exactMatch) {
+                    return exactMatch;
+                }
+
+                const partialMatch = options.find(function (item) {
+                    return item.normalized.includes(normalizedText);
+                });
+                return partialMatch || null;
+            }
+
+            function syncHiddenProductId() {
+                const matched = resolveProductId(comboInput.value);
+                if (matched) {
+                    hiddenProductIdInput.value = matched.id;
+                    comboInput.value = matched.label;
+                } else {
+                    hiddenProductIdInput.value = '';
+                }
+            }
+
+            comboInput.addEventListener('input', function () {
+                const matched = options.find(function (item) {
+                    return item.normalized === normalize(comboInput.value);
+                });
+
+                if (matched) {
+                    hiddenProductIdInput.value = matched.id;
+                } else {
+                    hiddenProductIdInput.value = '';
+                }
+            });
+
+            comboInput.addEventListener('change', function () {
+                syncHiddenProductId();
+            });
+
+            if (reportForm) {
+                reportForm.addEventListener('submit', function (e) {
+                    syncHiddenProductId();
+
+                    if (!hiddenProductIdInput.value) {
+                        e.preventDefault();
+                        alert('Vui lòng chọn sản phẩm hợp lệ từ danh sách gợi ý.');
+                        comboInput.focus();
+                    }
+                });
+            }
+
+            if (comboInput.value && !hiddenProductIdInput.value) {
+                syncHiddenProductId();
+            }
+        }
 
         if (startDateInput && endDateInput) {
             if (startDateInput.value) {
@@ -234,9 +353,8 @@
                 }
             });
 
-            const form = startDateInput.closest('form');
-            if (form) {
-                form.addEventListener('submit', function (e) {
+            if (reportForm) {
+                reportForm.addEventListener('submit', function (e) {
                     if (endDateInput.value < startDateInput.value) {
                         e.preventDefault();
                         alert('Lỗi: Ngày kết thúc không được nhỏ hơn ngày bắt đầu!');

@@ -19,12 +19,39 @@
 <!-- Shop Section Begin -->
 <section class="shop spad">
     <div class="container">
-        <div class="shop-horizontal-filter">
+        <div class="shop-filter-toggle-wrap">
+            <button type="button" id="toggle-advanced-filter-btn" class="shop-btn shop-btn--outline shop-btn--toggle">Tìm kiếm nâng cao</button>
+        </div>
+
+        <div class="shop-horizontal-filter is-hidden" id="advanced-filter-panel">
             <form id="searchForm" onsubmit="return false;" class="shop-horizontal-filter__form">
                 <div class="shop-horizontal-filter__fields">
                     <div class="shop-horizontal-filter__field shop-horizontal-filter__field--grow">
                         <label for="filter-keyword">Tìm theo tên</label>
                         <input id="filter-keyword" type="text" name="keyword" placeholder="Tìm kiếm sản phẩm..." value="<?= htmlspecialchars($keyword) ?>">
+                    </div>
+                    <div class="shop-horizontal-filter__field">
+                        <label for="horizontal-category-select">Loại sản phẩm</label>
+                        <select name="horizontal_category_id" id="horizontal-category-select">
+                            <option value="0" <?= $category_id == 0 ? 'selected' : '' ?>>Tất cả chủ đề</option>
+                            <?php foreach ($themes as $theme): ?>
+                                <option value="<?= $theme['id'] ?>" <?= $category_id == $theme['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($theme['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="shop-horizontal-filter__field">
+                        <label for="horizontal-price-select">Khoảng giá</label>
+                        <select name="horizontal_price_range" id="horizontal-price-select">
+                            <option value="" <?= $price_range == '' ? 'selected' : '' ?>>Tất cả</option>
+                            <option value="under_1m" <?= $price_range == 'under_1m' ? 'selected' : '' ?>>Dưới 1.000.000đ</option>
+                            <option value="1m_3m" <?= $price_range == '1m_3m' ? 'selected' : '' ?>>1 - 3 triệu</option>
+                            <option value="3m_5m" <?= $price_range == '3m_5m' ? 'selected' : '' ?>>3 - 5 triệu</option>
+                            <option value="5m_8m" <?= $price_range == '5m_8m' ? 'selected' : '' ?>>5 - 8 triệu</option>
+                            <option value="8m_10m" <?= $price_range == '8m_10m' ? 'selected' : '' ?>>8 - 10 triệu</option>
+                            <option value="over_10m" <?= $price_range == 'over_10m' ? 'selected' : '' ?>>Trên 10 triệu</option>
+                        </select>
                     </div>
                     <div class="shop-horizontal-filter__field shop-horizontal-filter__field--sort">
                         <label for="sort-select">Sắp xếp</label>
@@ -37,7 +64,7 @@
                 </div>
 
                 <div class="shop-horizontal-filter__actions">
-                    <button type="submit" class="shop-btn shop-btn--primary">Tìm</button>
+                    <button type="submit" class="shop-btn shop-btn--primary">Lọc</button>
                     <button type="button" id="filter-reset-btn" class="shop-btn shop-btn--outline">Reset</button>
                 </div>
             </form>
@@ -141,6 +168,16 @@
         --lego-border: #e7eaee;
     }
 
+    .shop-filter-toggle-wrap {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 12px;
+    }
+
+    .shop-btn--toggle {
+        min-width: 190px;
+    }
+
     .shop-horizontal-filter {
         background: #fff;
         border: 1px solid var(--lego-border);
@@ -148,6 +185,10 @@
         padding: 16px;
         margin-bottom: 28px;
         box-shadow: 0 8px 24px rgba(17, 24, 39, 0.05);
+    }
+
+    .shop-horizontal-filter.is-hidden {
+        display: none;
     }
 
     .shop-horizontal-filter__form {
@@ -159,7 +200,7 @@
 
     .shop-horizontal-filter__fields {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 10px;
         align-items: end;
     }
@@ -517,7 +558,7 @@
         }
 
         .shop-horizontal-filter__fields {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .shop-horizontal-filter__actions {
@@ -542,6 +583,10 @@
         .shop-horizontal-filter__form,
         .shop-horizontal-filter__fields {
             gap: 8px;
+        }
+
+        .shop-horizontal-filter__fields {
+            grid-template-columns: 1fr;
         }
 
         .shop-horizontal-filter__field label {
@@ -602,6 +647,15 @@
     }
 
     @media (max-width: 575px) {
+        .shop-filter-toggle-wrap {
+            justify-content: stretch;
+        }
+
+        .shop-btn--toggle {
+            width: 100%;
+            min-width: 0;
+        }
+
         .shop-btn {
             height: 38px;
             font-size: 13px;

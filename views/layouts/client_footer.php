@@ -82,6 +82,78 @@ $(document).ready(function() {
     // Chỉ thực thi mã này trên trang product list
     if ($('#product-list-container').length) {
         let currentPage = Number($('#product-list-data').data('current-page')) || 1;
+        const $searchForm = $('#searchForm');
+        const $filterForm = $('#filterForm');
+        const $sortSelect = $('#sort-select');
+        const $horizontalCategory = $('#horizontal-category-select');
+        const $horizontalPrice = $('#horizontal-price-select');
+        const $advancedFilterPanel = $('#advanced-filter-panel');
+        const $toggleAdvancedBtn = $('#toggle-advanced-filter-btn');
+        let isSyncingFilters = false;
+
+        function refreshNiceSelect($elements) {
+            if (!$.fn.niceSelect) {
+                return;
+            }
+
+            $elements.each(function() {
+                if ($(this).next('.nice-select').length) {
+                    $(this).niceSelect('update');
+                }
+            });
+        }
+
+        function updateAdvancedToggleLabel() {
+            if (!$advancedFilterPanel.length || !$toggleAdvancedBtn.length) {
+                return;
+            }
+
+            const isHidden = $advancedFilterPanel.hasClass('is-hidden');
+            $toggleAdvancedBtn.text(isHidden ? 'Tìm kiếm nâng cao' : 'Ẩn tìm kiếm nâng cao');
+        }
+
+        function setSidebarRadio(name, value, fallbackValue) {
+            let $target = $filterForm.find(`input[name="${name}"][value="${value}"]`);
+            if (!$target.length) {
+                $target = $filterForm.find(`input[name="${name}"][value="${fallbackValue}"]`);
+            }
+            if ($target.length) {
+                $target.prop('checked', true);
+            }
+        }
+
+        function syncSidebarToHorizontal() {
+            if (isSyncingFilters) {
+                return;
+            }
+
+            isSyncingFilters = true;
+
+            const categoryValue = $filterForm.find('input[name="category_id"]:checked').val() || '0';
+            const priceValue = $filterForm.find('input[name="price_range"]:checked').val() || '';
+
+            $horizontalCategory.val(categoryValue);
+            $horizontalPrice.val(priceValue);
+            refreshNiceSelect($horizontalCategory.add($horizontalPrice));
+
+            isSyncingFilters = false;
+        }
+
+        function syncHorizontalToSidebar() {
+            if (isSyncingFilters) {
+                return;
+            }
+
+            isSyncingFilters = true;
+
+            const categoryValue = String($horizontalCategory.val() || '0');
+            const priceValue = String($horizontalPrice.val() || '');
+
+            setSidebarRadio('category_id', categoryValue, '0');
+            setSidebarRadio('price_range', priceValue, '');
+
+            isSyncingFilters = false;
+        }
 
         function buildUrl(params) {
             const query = new URLSearchParams(params).toString();
@@ -91,12 +163,12 @@ $(document).ready(function() {
         function collectFilterParams(page = 1) {
             return {
                 page: page,
-                keyword: $('#searchForm input[name="keyword"]').val() || '',
-                category_id: $('#filterForm input[name="category_id"]:checked').val() || 0,
-                price_range: $('#filterForm input[name="price_range"]:checked').val() || '',
+                keyword: $searchForm.find('input[name="keyword"]').val() || '',
+                category_id: $horizontalCategory.val() || 0,
+                price_range: $horizontalPrice.val() || '',
                 price_from: '',
                 price_to: '',
-                sort: $('#sort-select').val() || ''
+                sort: $sortSelect.val() || ''
             };
         }
 
@@ -155,32 +227,52 @@ $(document).ready(function() {
             fetchProducts(collectFilterParams(page), shouldScrollTop);
         }
 
-        // Sidebar là nơi lọc chính cho chủ đề + khoảng giá
-        $('#filterForm input[type="radio"]').on('change', function() {
+        syncSidebarToHorizontal();
+        updateAdvancedToggleLabel();
+
+        if ($toggleAdvancedBtn.length && $advancedFilterPanel.length) {
+            $toggleAdvancedBtn.on('click', function() {
+                $advancedFilterPanel.toggleClass('is-hidden');
+                updateAdvancedToggleLabel();
+                refreshNiceSelect($sortSelect.add($horizontalCategory).add($horizontalPrice));
+            });
+        }
+
+        $filterForm.find('input[name="category_id"], input[name="price_range"]').on('change', function() {
+            syncSidebarToHorizontal();
             applyFilters(1);
         });
 
-        // Sort ở thanh ngang
-        $('#sort-select').on('change', function() {
-            applyFilters(1);
+        $horizontalCategory.on('change', function() {
+            syncHorizontalToSidebar();
         });
 
-        // Tìm kiếm theo từ khóa ở thanh ngang
-        $('#searchForm').on('submit', function(e) {
+        $horizontalPrice.on('change', function() {
+            syncHorizontalToSidebar();
+        });
+
+        // Chỉ thực thi lọc khi bấm nút Lọc ở thanh ngang
+        $searchForm.on('submit', function(e) {
             e.preventDefault();
+            syncHorizontalToSidebar();
             applyFilters(1);
         });
 
         // Reset đồng thời từ khóa/sắp xếp và bộ lọc sidebar
         $('#filter-reset-btn').on('click', function() {
-            $('#searchForm').trigger('reset');
-            $('#searchForm input[name="keyword"]').val('');
-            $('#sort-select').val('');
-            if ($.fn.niceSelect) {
-                $('#sort-select').niceSelect('update');
+            const searchFormEl = $searchForm.get(0);
+            if (searchFormEl) {
+                searchFormEl.reset();
             }
-            $('#filterForm input[name="category_id"][value="0"]').prop('checked', true);
-            $('#filterForm input[name="price_range"][value=""]').prop('checked', true);
+
+            $searchForm.find('input[name="keyword"]').val('');
+            $sortSelect.val('');
+            $horizontalCategory.val('0');
+            $horizontalPrice.val('');
+
+            syncHorizontalToSidebar();
+            refreshNiceSelect($sortSelect.add($horizontalCategory).add($horizontalPrice));
+
             applyFilters(1);
         });
 

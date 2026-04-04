@@ -181,7 +181,7 @@
                 </div>
                 <div class="modal-body">
                     <label class="form-label">Sẽ báo "Sắp hết" khi tồn kho dưới mức:</label>
-                    <input type="number" name="threshold_value" class="form-control" required min="1" placeholder="Ví dụ: 10">
+                    <input type="number" name="threshold_value" class="form-control mb-2" required min="1"> Định mức tồn kho hiện tại: <?= htmlspecialchars($item['low_stock_threshold']) ?></input>
                     <small class="text-muted mt-2 d-block">Mức này sẽ được áp dụng cho toàn bộ sản phẩm hiện có.</small>
                 </div>
                 <div class="modal-footer">

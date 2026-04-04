@@ -393,9 +393,9 @@ class ProductModel extends BaseModel
 
          
         $sqlExport = "SELECT SUM(od.quantity) as total_out 
-                      FROM order_details od 
-                      JOIN orders o ON od.order_id = o.id 
-                      WHERE od.product_id = ? AND o.status != 3 AND o.created_at <= ?";
+                  FROM order_details od 
+                  JOIN orders o ON od.order_id = o.id 
+                  WHERE od.product_id = ? AND o.status = 2 AND o.created_at <= ?";
                       
         $stmtOut = $this->conn->prepare($sqlExport);
         $stmtOut->bind_param("is", $productId, $endOfDay);
@@ -430,7 +430,7 @@ class ProductModel extends BaseModel
         $sqlExport = "SELECT SUM(od.quantity) as total_out 
                       FROM order_details od 
                       JOIN orders o ON od.order_id = o.id 
-                      WHERE od.product_id = ? AND o.status != 3 
+                      WHERE od.product_id = ? AND o.status = 2 
                       AND o.created_at >= ? AND o.created_at <= ?";
         $stmtOut = $this->conn->prepare($sqlExport);
         $stmtOut->bind_param("iss", $productId, $startOfDay, $endOfDay);
@@ -509,7 +509,7 @@ class ProductModel extends BaseModel
         $sql = "SELECT o.id as order_id, o.created_at, od.quantity, od.price, o.status
                 FROM order_details od
                 JOIN orders o ON od.order_id = o.id
-                WHERE od.product_id = ? AND o.status != 3
+            WHERE od.product_id = ? AND o.status = 2
                 AND o.created_at >= ? AND o.created_at <= ?
                 ORDER BY o.created_at DESC";
 
