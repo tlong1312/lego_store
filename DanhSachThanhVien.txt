@@ -1,0 +1,13 @@
+HỌC PHẦN: LẬP TRÌNH WEB VÀ ỨNG DỤNG NÂNG CAO
+
+ĐỒ ÁN: XÂY DỰNG WEBSIDE BÁN LEGO
+
+GIẢNG VIÊN HƯỚNG DẪN: CAO THÁI PHƯƠNG THANH
+
+NHÓM LỚP 01
+
+----------------------------------------------------------------------------------------------
+| STT   | Student ID (MSSV) | Full Name (Họ Tên) | Role / Tasks (Nhiệm vụ) | Contribution (%) |
+| 1     |     3122410215    |   Đặng Tiểu Long   |   Full-stack Developer  |      50%         |
+| 2     |     3122410218    |   Trần Hoàng Long  |   Full-stack Developer  |      50%         |
+----------------------------------------------------------------------------------------------
