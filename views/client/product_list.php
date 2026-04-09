@@ -195,13 +195,15 @@
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         align-items: end;
-        gap: 14px;
+        column-gap: 16px;
+        row-gap: 12px;
     }
 
     .shop-horizontal-filter__fields {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(4, minmax(180px, 1fr));
+        column-gap: 14px;
+        row-gap: 12px;
         align-items: end;
     }
 
@@ -236,7 +238,7 @@
         background: #fff;
     }
 
-    .shop-horizontal-filter__field--sort .nice-select {
+    .shop-horizontal-filter__field .nice-select {
         width: 100%;
         height: 44px;
         line-height: 42px;
@@ -244,16 +246,21 @@
         border-radius: 10px;
         padding-left: 12px;
         float: none;
+        display: block;
     }
 
-    .shop-horizontal-filter__field--sort .nice-select .current {
+    .shop-horizontal-filter__field .nice-select .current {
         display: block;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
-    .shop-horizontal-filter__field--sort .nice-select:after {
+    .shop-horizontal-filter__field .nice-select:after {
         right: 14px;
+    }
+
+    .shop-horizontal-filter__field .nice-select .list {
+        width: 100%;
     }
 
     .shop-horizontal-filter__actions {
@@ -559,6 +566,8 @@
 
         .shop-horizontal-filter__fields {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+            column-gap: 12px;
+            row-gap: 10px;
         }
 
         .shop-horizontal-filter__actions {
@@ -582,7 +591,7 @@
 
         .shop-horizontal-filter__form,
         .shop-horizontal-filter__fields {
-            gap: 8px;
+            gap: 10px;
         }
 
         .shop-horizontal-filter__fields {
@@ -596,12 +605,12 @@
 
         .shop-horizontal-filter__field input,
         .shop-horizontal-filter__field select,
-        .shop-horizontal-filter__field--sort .nice-select {
+        .shop-horizontal-filter__field .nice-select {
             height: 40px;
             font-size: 13px;
         }
 
-        .shop-horizontal-filter__field--sort .nice-select {
+        .shop-horizontal-filter__field .nice-select {
             line-height: 38px;
         }
 

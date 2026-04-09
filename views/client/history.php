@@ -14,7 +14,6 @@
     </div>
 </section>
 <style>
-    /* Áp dụng cho màn hình có chiều rộng tối đa 768px (điện thoại, máy tính bảng nhỏ) */
     @media screen and (max-width: 768px) {
         .shopping__cart__table table {
             border: 0;

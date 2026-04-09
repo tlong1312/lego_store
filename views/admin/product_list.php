@@ -101,7 +101,6 @@
 
                                 <td class="text-center align-middle">
                                     <?php
-                                    // BỔ SUNG: Ép kiểu (int) cực kỳ quan trọng để không bị lỗi 100 <= 10
                                     $currentStock = (int)($item['stock_quantity'] ?? 0);
                                     $lowStockThreshold = (int)($item['low_stock_threshold'] ?? 10);
 
